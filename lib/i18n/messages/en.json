@@ -5,5 +5,51 @@
   "Metadata": {
     "title": "CareU",
     "description": "CareU — online shopping in Bangladesh."
+  },
+  "Announcement": {
+    "items": [
+      "Free delivery on orders over ৳999",
+      { "text": "Track your order anytime", "href": "/order/track" },
+      "Cash on delivery available nationwide",
+      {
+        "text": "New arrivals in Electronics",
+        "href": "/search?q=electronics"
+      }
+    ]
+  },
+  "Header": {
+    "brand": "CareU",
+    "brandTagline": "Online shopping in Bangladesh",
+    "searchPlaceholder": "Search products, brands and categories",
+    "searchLabel": "Search",
+    "signIn": "Sign in",
+    "register": "Register",
+    "account": "Account",
+    "wishlist": "Wishlist",
+    "cart": "Bag",
+    "trackOrder": "Track order",
+    "menu": "Menu",
+    "closeMenu": "Close menu",
+    "allCategories": "All categories",
+    "language": "Language",
+    "localeEn": "EN",
+    "localeBn": "বাং",
+    "shopAll": "Shop all",
+    "viewAll": "View all",
+    "viewAllCategory": "View all {category}",
+    "featuredProducts": "Featured products",
+    "navigation": "Product categories"
+  },
+  "Pages": {
+    "search": "Search",
+    "cart": "Your bag",
+    "wishlist": "Wishlist",
+    "account": "My account",
+    "trackOrder": "Track your order",
+    "login": "Sign in",
+    "register": "Create account"
+  },
+  "Placeholder": {
+    "message": "This page is coming soon."
   }
 }

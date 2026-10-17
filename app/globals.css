@@ -129,3 +129,43 @@
     @apply font-sans;
   }
 }
+
+/* Announcement bar: CSS-only rotation.
+   steps(N, end) on a full -100% translate yields exactly N aligned stops
+   (0, -1h, -2h … -(N-1)h) because the track is N items tall. */
+@keyframes announcement-scroll {
+  to {
+    transform: translateY(-100%);
+  }
+}
+
+.announcement-track:hover {
+  animation-play-state: paused;
+}
+
+/* Keyboard focus: stop rotation and expand the clipped list into an overlay
+   so every message (and its link) becomes visible and reachable.
+   :focus-visible (not :focus-within) so mouse-clicking a link does not
+   expand the whole list. */
+.announcement-track:has(:focus-visible) {
+  animation: none !important;
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  z-index: 50;
+  background: var(--color-muted);
+  border-bottom: 1px solid var(--color-border);
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+.announcement-viewport:has(.announcement-track:has(:focus-visible)) {
+  overflow: visible;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .announcement-track {
+    animation: none !important;
+  }
+}

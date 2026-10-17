@@ -5,5 +5,51 @@
   "Metadata": {
     "title": "CareU",
     "description": "CareU — বাংলাদেশে অনলাইন শপিং।"
+  },
+  "Announcement": {
+    "items": [
+      "৯৯৯ টাকার বেশি অর্ডারে ফ্রি ডেলিভারি",
+      { "text": "যেকোনো সময় অর্ডার ট্র্যাক করুন", "href": "/order/track" },
+      "সারা দেশে ক্যাশ অন ডেলিভারি",
+      {
+        "text": "ইলেকট্রনিক্সে নতুন এসেছে",
+        "href": "/search?q=electronics"
+      }
+    ]
+  },
+  "Header": {
+    "brand": "CareU",
+    "brandTagline": "বাংলাদেশে অনলাইন শপিং",
+    "searchPlaceholder": "পণ্য, ব্র্যান্ড ও ক্যাটাগরি খুঁজুন",
+    "searchLabel": "খুঁজুন",
+    "signIn": "সাইন ইন",
+    "register": "রেজিস্টার",
+    "account": "অ্যাকাউন্ট",
+    "wishlist": "উইশলিস্ট",
+    "cart": "ব্যাগ",
+    "trackOrder": "অর্ডার ট্র্যাক",
+    "menu": "মেনু",
+    "closeMenu": "মেনু বন্ধ করুন",
+    "allCategories": "সব ক্যাটাগরি",
+    "language": "ভাষা",
+    "localeEn": "EN",
+    "localeBn": "বাং",
+    "shopAll": "সব দেখুন",
+    "viewAll": "সব দেখুন",
+    "viewAllCategory": "{category} — সব দেখুন",
+    "featuredProducts": "নির্বাচিত পণ্য",
+    "navigation": "পণ্যের ক্যাটাগরি"
+  },
+  "Pages": {
+    "search": "সার্চ",
+    "cart": "আপনার ব্যাগ",
+    "wishlist": "উইশলিস্ট",
+    "account": "আমার অ্যাকাউন্ট",
+    "trackOrder": "অর্ডার ট্র্যাক করুন",
+    "login": "সাইন ইন",
+    "register": "অ্যাকাউন্ট তৈরি করুন"
+  },
+  "Placeholder": {
+    "message": "এই পেজটি শীঘ্রই আসছে।"
   }
 }
