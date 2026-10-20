@@ -12,6 +12,13 @@ This block is written and re-added by `next dev`; do not remove it.
 
 <!-- END:nextjs-agent-rules -->
 
+<!-- BEGIN:skills-agent-rules -->
+
+This is not the skills you know. Read the relevant guide in
+`.agents/skills` before writing any code. Heed deprecation notices.
+
+<!-- END:skills-agent-rules -->
+
 ## Project
 
 CareU.bd

@@ -1,17 +1,33 @@
-import 'server-only';
+import { betterAuth } from "better-auth";
+import { prismaAdapter } from "better-auth/adapters/prisma";
+import { emailOTP, phoneNumber } from "better-auth/plugins";
+import { prisma } from "./prisma";
 
-export type CurrentUser = {
-  id: string;
-  name: string;
-  email?: string;
-  phone?: string;
-} | null;
-
-/**
- * Placeholder for Better Auth integration. Returns null for unauthenticated state.
- * This keeps the header's Suspense boundary stable so we can wire auth later without
- * changing component structure.
- */
-export async function getCurrentUser(): Promise<CurrentUser> {
-  return null;
-}
+export const auth = betterAuth({
+  database: prismaAdapter(prisma, {
+    provider: "postgresql", // or "mysql", "sqlite", ...etc
+  }),
+  plugins: [
+    phoneNumber({
+      sendOTP: ({ phoneNumber, code }, ctx) => {
+        // Implement sending OTP code via SMS
+      },
+    }),
+    emailOTP({
+      async sendVerificationOTP({ email, otp, type }) {
+        if (type === "sign-in") {
+          // Send the OTP for sign in
+        } else if (type === "email-verification") {
+          // Send the OTP for email verification
+        } else {
+          // Send the OTP for password reset
+        }
+      },
+    }),
+  ],
+  advanced: {
+    database: {
+      joins: true, // Enable joins for better performance
+    },
+  },
+});
