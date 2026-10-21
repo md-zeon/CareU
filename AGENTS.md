@@ -30,7 +30,7 @@ CareU.bd
 - Tailwind CSS v4 + shadcn/ui on **Base UI** primitives (Vega style)
 - next-intl — locales `en` (default) + `bn`, `localePrefix: 'always'`
 - Prisma + Neon Postgres (`aws-ap-southeast-1`)
-- Better Auth — phone + OTP
+- Better Auth — phone + OTP and email OTP
 - Zustand (cart), react-hook-form + zod, sonner (toasts)
 - Vercel (`sin1`) behind Cloudflare (orange cloud)
 - Media: Cloudflare R2 + Image Transformations; Bunny Stream for video
@@ -62,14 +62,38 @@ CareU.bd
 
 - Wrap EVERY Prisma catalog read in `'use cache'` + `cacheLife(...)` + `cacheTag(...)`.
 - NEVER call `headers()` or `cookies()` inside a `'use cache'` scope.
+  Exception: `'use cache: private'` scopes MAY read them (browser-only,
+  request-time) — that's where session reads belong.
 - `generateStaticParams` returns slugs only (one cheap query) — never full rows.
 - On admin save: `updateTag(tag)`. In the background: `revalidateTag(tag, 'max')`.
 
 ### Auth
 
-- Never `await` `sendOTP` — dispatch it via `waitUntil`.
-- SMS is behind the `lib/sms.ts` provider interface. The console stub must
-  refuse to run when `NODE_ENV === 'production'`.
+- `lib/auth.ts` must stay **CLI-clean** — the Better Auth CLI loads it in
+  plain Node via jiti: no `server-only` import, no `@/` path aliases, relative
+  imports only. Session helpers live in `lib/session.ts` (`server-only` is
+  allowed there).
+- After every `npx auth generate`, restore the generator block — it rewrites
+  `prisma/schema.prisma` and drops `output = "../lib/generated/prisma"`.
+  Pass `--yes` to skip the overwrite prompt. Never use `npx prisma@latest`
+  (Prisma 8 is RC; `latest` resolves to v8 and breaks the toolchain).
+- OTP sends (`sendOTP`, `sendVerificationOTP`) must return fast: dispatch via
+  `after()` from `next/server` — never `await` the SMS/email send.
+- SMS is behind the `lib/provider/sms.ts` interface; email behind
+  `lib/provider/email.ts`. The console stubs must refuse to run when
+  `NODE_ENV === 'production'`.
+- Session reads: `getCurrentUser` in `lib/session.ts` is a `use cache: private`
+  function (Next Cache Components auth guide). Call it only from Suspense-leaf
+  server components — never from a layout top level and never from inside a
+  plain `'use cache'` scope.
+- Keep `session.cookieCache` enabled, but narrow the returned user to
+  `{id, name, email?, phone?}` — never pass the full session user down.
+- Rate limiting is DB-backed (`storage: "database"`) with tight custom rules
+  on the OTP endpoints (re-run `npx auth generate` after changing it — it
+  manages the `RateLimit` model). Client IP comes from `cf-connecting-ip`
+  only (we sit behind Cloudflare).
+- BD phone numbers must match `/^(\+880|0)1[3-9]\d{8}$/` (`phoneNumberValidator`).
+- `nextCookies()` is the LAST plugin in the array.
 
 ### Commerce integrity
 
@@ -111,5 +135,5 @@ Keep storefront client JS under the CI budget (~120 KB gzipped).
 - Style: Base UI + Vega preset. Colors: placeholder (neutral) — TBD.
   Three things worth calling out:
 - Don't delete the BEGIN:nextjs-agent-rules block. next dev re-injects it; removing it just creates churn in your diffs.
-- The Commands section is the highest-value part — agents run these to verify work. typecheck doesn't exist yet; we should add it to package.json.
+- The Commands section is the highest-value part — agents run these to verify work.
 - Keep it rules, not documentation. Every line should be something an agent could accidentally get wrong. Prose that just restates the stack belongs in the README.

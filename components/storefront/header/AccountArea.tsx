@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { UserIcon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/session";
 import type { Locale } from "@/lib/i18n/routing";
 
 type AccountAreaProps = {
