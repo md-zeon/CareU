@@ -428,6 +428,16 @@ decisions" below.
   SSLCommerz as the initial online gateway behind a validated IPN; verified,
   idempotent callbacks; pending/failed/delayed/uncertain states handled
   safely; late payments reconciled before stock/order finalisation.
+- COD: **CareU owns the entire COD workflow end-to-end** (D-08) — collecting
+  through delivery/courier, tracking cash collected, courier-held funds,
+  remittances and reconciliation, investigating discrepancies and courier
+  shortages, settling seller earnings, coordinating COD cancellations/
+  returns/refunds, and keeping an auditable record of every collection,
+  remittance, adjustment and settlement. **Sellers never collect COD, never
+  coordinate remittances, and never independently reconcile collections.**
+  Never auto-classify a COD shortage as seller debt or a confirmed CareU
+  expense — it is an open reconciliation item resolved only by an explicit,
+  reasoned, evidenced, audited adjustment (D-32).
 - Commissions & settlements: category-based commission rates; CareU collects
   online payments and settles eligible seller earnings later; manual payout
   batches recording amount, currency, method, destination reference, status and
@@ -451,7 +461,9 @@ decisions" below.
   return-eligibility and deadline *settings*, actions gated on item and
   shipment status, exceptions routed to authorized review, refunds to the
   original method where supported, COD refunds requiring a manually verified
-  payout method + admin approval + a recorded transaction reference, and
+  payout method + admin approval + a recorded transaction reference (CareU
+  coordinates COD cancellations/returns/refunds; sellers never disburse COD
+  cash), and
   disputes that preserve both explanations, attachments, order/item history,
   decision reason, resolution and refund/settlement impact, decided by CareU
   support/admin, with unresolved disputes blocking **only the affected
@@ -485,8 +497,12 @@ confirmation.
   delivery, acceptable COD refund payout methods.
 - Delivery pricing model and coverage (all districts vs. Dhaka-first), free
   delivery threshold, and whether the buyer, seller or platform bears it.
-- COD remittance mechanics (per-seller receivable vs. netted into a payout
-  batch).
+- COD remittance *mechanics* (per-seller receivable vs. netted into a payout
+  batch) — the mechanism is open, but **ownership is confirmed: CareU owns the
+  entire COD workflow end-to-end (D-08/D-32)**, including courier-held cash,
+  investigation of shortages, and any eventual loss allocation (which must be
+  explicit, reasoned, evidenced and audited — never an automatic seller debt
+  or a confirmed CareU expense).
 - Tax/VAT at launch: applicability, inclusive vs exclusive, integer-BDT
   rounding.
 - Display currency scope at launch and the FX rate source.
