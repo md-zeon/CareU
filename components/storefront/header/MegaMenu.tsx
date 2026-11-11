@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { ArrowRightIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice } from "@/lib/catalog/price";
+import { bdtToPoisha } from "@/lib/money/poisha";
 import type { MenuCategory, MenuProduct } from "@/lib/catalog/menu.types";
 import type { Locale } from "@/lib/i18n/routing";
 
@@ -41,10 +42,10 @@ function MenuProductCard({ product, locale }: MenuProductCardProps) {
         {product.title[locale]}
       </p>
       <p className="mt-0.5 text-sm">
-        <span className="font-semibold">{formatPrice(product.price, locale)}</span>
+        <span className="font-semibold">{formatPrice(bdtToPoisha(product.price), locale)}</span>
         {product.compareAtPrice != null && (
           <span className="ml-1.5 text-muted-foreground line-through">
-            {formatPrice(product.compareAtPrice, locale)}
+            {formatPrice(bdtToPoisha(product.compareAtPrice), locale)}
           </span>
         )}
       </p>
