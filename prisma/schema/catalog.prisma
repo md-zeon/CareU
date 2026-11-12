@@ -1,0 +1,155 @@
+// Catalog and sellable listings
+
+model Category {
+  id           String              @id @default(cuid())
+  parentId     String?
+  parent       Category?           @relation("CategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children     Category[]          @relation("CategoryTree")
+  slug         String              @unique
+  name         String
+  description  String?
+  status       CategoryStatus      @default(ACTIVE)
+  isRestricted Boolean             @default(false)
+  isProhibited Boolean             @default(false)
+  sortOrder    Int                 @default(0)
+  metadata     Json?
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  attributes   CategoryAttribute[]
+  products     Product[]
+  listings     Listing[]
+  commissionRules CommissionRule[]
+
+  @@index([parentId])
+  @@index([status])
+  @@map("category")
+}
+
+model CategoryAttribute {
+  id         String                    @id @default(cuid())
+  categoryId String
+  category   Category                  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  key        String
+  label      String
+  valueType  CategoryAttributeValueType
+  required   Boolean                   @default(false)
+  options    Json?
+  config     Json?
+  createdAt  DateTime                  @default(now())
+  updatedAt  DateTime                  @updatedAt
+
+  @@unique([categoryId, key])
+  @@index([categoryId])
+  @@map("category_attribute")
+}
+
+model Product {
+  id              String           @id @default(cuid())
+  categoryId      String
+  category        Category         @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  title           String
+  description     String?
+  brand           String?
+  attributes      Json?
+  status          ProductStatus    @default(DRAFT)
+  createdByUserId String?
+  createdByUser   User?            @relation("ProductCreator", fields: [createdByUserId], references: [id], onDelete: SetNull)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  variants        ProductVariant[]
+  listings        Listing[]
+  reviews         Review[]
+
+  @@index([categoryId])
+  @@index([status])
+  @@map("product")
+}
+
+model ProductVariant {
+  id         String           @id @default(cuid())
+  productId  String
+  product    Product          @relation(fields: [productId], references: [id], onDelete: Cascade)
+  attributes Json?
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  listingVariants ListingVariant[]
+
+  @@index([productId])
+  @@map("product_variant")
+}
+
+model Listing {
+  id               String                  @id @default(cuid())
+  shopId           String
+  shop             Shop                    @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  productId        String?
+  product          Product?                @relation(fields: [productId], references: [id], onDelete: SetNull)
+  categoryId       String
+  category         Category                @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  title            String
+  description      String?
+  attributes       Json?
+  moderationStatus ListingModerationStatus @default(DRAFT)
+  publishStatus    ListingPublishStatus    @default(DRAFT)
+  createdAt        DateTime                @default(now())
+  updatedAt        DateTime                @updatedAt
+  variants         ListingVariant[]
+  media            ListingMedia[]
+  orderItems       OrderItem[]
+  wishlistItems    WishlistItem[]
+  reviews          Review[]
+
+  @@index([shopId])
+  @@index([productId])
+  @@index([categoryId])
+  @@index([moderationStatus])
+  @@index([publishStatus])
+  @@map("listing")
+}
+
+model ListingVariant {
+  id                String               @id @default(cuid())
+  listingId         String
+  listing           Listing              @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  productVariantId  String?
+  productVariant    ProductVariant?      @relation(fields: [productVariantId], references: [id], onDelete: SetNull)
+  sku               String
+  pricePoisha       BigInt
+  compareAtPoisha   BigInt?
+  currency          String               @default("BDT")
+  status            ListingVariantStatus @default(DRAFT)
+  attributes        Json?
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+  inventoryBalances InventoryBalance[]
+  stockMovements    StockMovement[]
+  stockReservations StockReservation[]
+  orderItems        OrderItem[]
+  wishlistItems     WishlistItem[]
+  media             ListingMedia[]
+
+  @@unique([listingId, sku])
+  @@index([listingId])
+  @@index([productVariantId])
+  @@index([status])
+  @@map("listing_variant")
+}
+
+model ListingMedia {
+  id               String           @id @default(cuid())
+  listingId        String
+  listing          Listing          @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  listingVariantId String?
+  listingVariant   ListingVariant?  @relation(fields: [listingVariantId], references: [id], onDelete: SetNull)
+  storageKey       String?
+  publicUrl        String?
+  mediaType        ListingMediaType @default(IMAGE)
+  sortOrder        Int              @default(0)
+  altText          String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  @@index([listingId])
+  @@index([listingVariantId])
+  @@map("listing_media")
+}

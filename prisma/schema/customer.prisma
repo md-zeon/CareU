@@ -1,0 +1,56 @@
+// Persisted customer records (cart remains browser only)
+
+model SavedAddress {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label        String?
+  recipient    String
+  phone        String
+  addressLine1 String
+  addressLine2 String?
+  area         String?
+  district     String
+  division     String?
+  postalCode   String?
+  country      String   @default("BD")
+  // At most one default address per user, enforced by a partial unique index
+  // in the migration.
+  isDefault    Boolean  @default(false)
+  metadata     Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  orders       Order[]  @relation("OrderShippingAddress")
+
+  @@index([userId])
+  @@map("saved_address")
+}
+
+model Wishlist {
+  id        String         @id @default(cuid())
+  userId    String         @unique
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  items     WishlistItem[]
+
+  @@map("wishlist")
+}
+
+model WishlistItem {
+  id               String          @id @default(cuid())
+  wishlistId       String
+  wishlist         Wishlist        @relation(fields: [wishlistId], references: [id], onDelete: Cascade)
+  listingId        String?
+  listing          Listing?        @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  listingVariantId String?
+  listingVariant   ListingVariant? @relation(fields: [listingVariantId], references: [id], onDelete: Cascade)
+  addedAt          DateTime        @default(now())
+
+  // Prisma unique indexes on nullable columns do not prevent duplicate listing-only rows.
+  // Enforce uniqueness and target validity in the database migration with partial unique indexes and a CHECK.
+  @@index([wishlistId])
+  @@index([listingId])
+  @@index([listingVariantId])
+  @@map("wishlist_item")
+}

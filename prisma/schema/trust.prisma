@@ -1,0 +1,192 @@
+// Reviews, support, disputes, notifications, and audit logs
+
+// One review per user per purchased product. When the listing belongs to a
+// shared Product, the application must populate productId so the per product
+// unique index applies; a standalone listing is its own product scope.
+model Review {
+  id          String       @id @default(cuid())
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listingId   String?
+  listing     Listing?     @relation(fields: [listingId], references: [id], onDelete: Restrict)
+  productId   String?
+  product     Product?     @relation(fields: [productId], references: [id], onDelete: Restrict)
+  orderItemId String
+  orderItem   OrderItem    @relation(fields: [orderItemId], references: [id], onDelete: Restrict)
+  rating      Int
+  body        String?
+  status      ReviewStatus @default(PUBLISHED)
+  editedAt    DateTime?
+  reportCount Int          @default(0)
+  metadata    Json?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@unique([userId, orderItemId])
+  @@index([listingId])
+  @@index([productId])
+  @@index([userId])
+  @@index([status])
+  @@map("review")
+}
+
+model SupportCase {
+  id             String                     @id @default(cuid())
+  customerUserId String
+  customerUser   User                       @relation("SupportCaseCustomer", fields: [customerUserId], references: [id], onDelete: Cascade)
+  orderId        String?
+  order          Order?                     @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  orderItemId    String?
+  orderItem      OrderItem?                 @relation(fields: [orderItemId], references: [id], onDelete: Restrict)
+  shopId         String?
+  shop           Shop?                      @relation(fields: [shopId], references: [id], onDelete: Restrict)
+  assigneeUserId String?
+  assigneeUser   User?                      @relation("SupportCaseAssignee", fields: [assigneeUserId], references: [id], onDelete: SetNull)
+  category       String?
+  priority       SupportCasePriority        @default(NORMAL)
+  status         SupportCaseStatus          @default(OPEN)
+  subject        String?
+  resolution     String?
+  createdAt      DateTime                   @default(now())
+  updatedAt      DateTime                   @updatedAt
+  messages       SupportMessage[]
+  statusHistory  SupportCaseStatusHistory[]
+
+  @@index([customerUserId])
+  @@index([orderId])
+  @@index([orderItemId])
+  @@index([shopId])
+  @@index([assigneeUserId, status])
+  @@index([status])
+  @@map("support_case")
+}
+
+model SupportCaseStatusHistory {
+  id          String             @id @default(cuid())
+  caseId      String
+  supportCase SupportCase        @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  fromStatus  SupportCaseStatus?
+  toStatus    SupportCaseStatus
+  actorUserId String?
+  actorUser   User?              @relation("SupportCaseStatusActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  reason      String?
+  createdAt   DateTime           @default(now())
+
+  @@index([caseId, createdAt])
+  @@map("support_case_status_history")
+}
+
+model SupportMessage {
+  id           String                   @id @default(cuid())
+  caseId       String
+  supportCase  SupportCase              @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  authorUserId String?
+  authorUser   User?                    @relation("SupportMessageAuthor", fields: [authorUserId], references: [id], onDelete: SetNull)
+  authorType   SupportAuthorType
+  visibility   SupportMessageVisibility @default(CUSTOMER)
+  body         String
+  attachments  Json?
+  createdAt    DateTime                 @default(now())
+
+  @@index([caseId, createdAt])
+  @@index([visibility])
+  @@map("support_message")
+}
+
+model Dispute {
+  id                  String        @id @default(cuid())
+  orderId             String?
+  order               Order?        @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  shipmentId          String?
+  shipment            Shipment?     @relation(fields: [shipmentId], references: [id], onDelete: Restrict)
+  orderItemId         String?
+  orderItem           OrderItem?    @relation(fields: [orderItemId], references: [id], onDelete: Restrict)
+  shopId              String
+  shop                Shop          @relation(fields: [shopId], references: [id], onDelete: Restrict)
+  openedByUserId      String?
+  openedByUser        User?         @relation("DisputeOpener", fields: [openedByUserId], references: [id], onDelete: SetNull)
+  status              DisputeStatus @default(OPEN)
+  customerExplanation String?
+  sellerExplanation   String?
+  evidence            Json?
+  decisionReason      String?
+  resolution          String?
+  moneyImpactPoisha   BigInt?
+  eligibilityImpact   String?
+  resolvedByUserId    String?
+  resolvedByUser      User?         @relation("DisputeResolver", fields: [resolvedByUserId], references: [id], onDelete: SetNull)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  resolvedAt          DateTime?
+
+  @@index([orderId])
+  @@index([shipmentId])
+  @@index([orderItemId])
+  @@index([shopId])
+  @@index([openedByUserId])
+  @@index([resolvedByUserId])
+  @@index([status])
+  @@map("dispute")
+}
+
+model Notification {
+  id                String                      @id @default(cuid())
+  recipientUserId   String?
+  recipientUser     User?                       @relation("NotificationRecipient", fields: [recipientUserId], references: [id], onDelete: SetNull)
+  channel           NotificationChannel
+  type              String
+  subject           String?
+  payload           Json?
+  status            NotificationStatus          @default(QUEUED)
+  relatedEntityType String?
+  relatedEntityId   String?
+  sentAt            DateTime?
+  readAt            DateTime?
+  metadata          Json?
+  createdAt         DateTime                    @default(now())
+  updatedAt         DateTime                    @updatedAt
+  statusHistory     NotificationStatusHistory[]
+
+  @@index([recipientUserId])
+  @@index([channel, status])
+  @@index([relatedEntityType, relatedEntityId])
+  @@map("notification")
+}
+
+model NotificationStatusHistory {
+  id             String             @id @default(cuid())
+  notificationId String
+  notification   Notification       @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  fromStatus     NotificationStatus?
+  toStatus       NotificationStatus
+  actorUserId    String?
+  actorUser      User?              @relation("NotificationStatusActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  reason         String?
+  createdAt      DateTime           @default(now())
+
+  @@index([notificationId, createdAt])
+  @@map("notification_status_history")
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  actorUserId String?
+  actorUser   User?    @relation("AuditLogActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  actorScope  String?
+  action      String
+  entityType  String
+  entityId    String
+  shopId      String?
+  shop        Shop?    @relation(fields: [shopId], references: [id], onDelete: SetNull)
+  reason      String?
+  before      Json?
+  after       Json?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  @@index([actorUserId])
+  @@index([entityType, entityId])
+  @@index([shopId])
+  @@index([createdAt])
+  @@map("audit_log")
+}

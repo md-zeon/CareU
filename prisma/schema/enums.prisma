@@ -1,0 +1,295 @@
+// Shared marketplace enums (spec 0001)
+
+enum SellerApplicationType {
+  INDIVIDUAL
+  BUSINESS
+}
+
+enum SellerApplicationStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum SellerVerificationDocumentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ShopStatus {
+  PENDING
+  ACTIVE
+  PAUSED
+  SUSPENDED
+}
+
+enum ShopMembershipStatus {
+  INVITED
+  ACTIVE
+  REMOVED
+}
+
+enum CategoryStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum CategoryAttributeValueType {
+  TEXT
+  NUMBER
+  BOOLEAN
+  SELECT
+  MULTI_SELECT
+}
+
+enum ProductStatus {
+  DRAFT
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum ListingModerationStatus {
+  DRAFT
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+  HIDDEN
+  REMOVED
+}
+
+enum ListingPublishStatus {
+  DRAFT
+  PUBLISHED
+  UNPUBLISHED
+}
+
+enum ListingVariantStatus {
+  DRAFT
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum ListingMediaType {
+  IMAGE
+  VIDEO
+}
+
+enum StockLocationType {
+  WAREHOUSE
+  SHOP
+  PLATFORM
+}
+
+enum StockMovementReason {
+  SALE
+  RESERVE
+  RELEASE
+  RETURN
+  RESTOCK
+  DAMAGE
+  ADJUSTMENT
+}
+
+enum StockReservationStatus {
+  ACTIVE
+  COMMITTED
+  RELEASED
+  EXPIRED
+}
+
+enum PaymentMethod {
+  COD
+  ONLINE
+}
+
+enum PaymentCanonicalStatus {
+  INITIATED
+  PENDING
+  AUTHORIZED_OR_PAID
+  FAILED
+  CANCELLED
+  UNCERTAIN
+  RECONCILED
+  SETTLED
+}
+
+enum PaymentEventVerificationStatus {
+  UNVERIFIED
+  VERIFIED
+  INVALID
+  DUPLICATE
+}
+
+enum RefundMethod {
+  ORIGINAL_PAYMENT
+  BANK_TRANSFER
+  MOBILE_WALLET
+  CASH
+  OTHER
+}
+
+enum RefundStatus {
+  REQUESTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum PayoutBatchStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  PROCESSING
+  COMPLETED
+  PARTIAL
+  FAILED
+}
+
+enum PayoutItemStatus {
+  PENDING
+  PROCESSING
+  PAID
+  FAILED
+  CANCELLED
+}
+
+enum CODReconciliationRecordType {
+  COLLECTED
+  COURIER_HELD
+  REMITTED
+  SHORTAGE
+  ADJUSTMENT
+}
+
+enum CODReconciliationStatus {
+  OPEN
+  RESOLVED
+}
+
+enum LedgerEntryType {
+  SALE
+  COMMISSION
+  DISCOUNT_FUNDING
+  REFUND
+  PAYOUT
+  COD_COLLECTION
+  COD_REMITTANCE
+  ADJUSTMENT
+  OTHER
+}
+
+enum LedgerDirection {
+  DEBIT
+  CREDIT
+}
+
+enum LedgerEligibilityStatus {
+  PENDING
+  ELIGIBLE
+  BLOCKED
+  SETTLED
+  VOID
+}
+
+enum ReviewStatus {
+  PUBLISHED
+  HIDDEN
+  REMOVED
+}
+
+enum SupportCaseStatus {
+  OPEN
+  IN_PROGRESS
+  WAITING_CUSTOMER
+  RESOLVED
+  CLOSED
+}
+
+enum SupportCasePriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum SupportMessageVisibility {
+  CUSTOMER
+  INTERNAL
+}
+
+enum SupportAuthorType {
+  CUSTOMER
+  SELLER
+  STAFF
+  SYSTEM
+}
+
+enum DisputeStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED
+  REJECTED
+  CANCELLED
+}
+
+enum NotificationChannel {
+  EMAIL
+  IN_APP
+}
+
+enum NotificationStatus {
+  QUEUED
+  SENT
+  DELIVERED
+  FAILED
+  READ
+}
+
+enum FulfillmentStatus {
+  PLACED
+  CONFIRMED
+  PROCESSING
+  PACKED
+  SHIPPED
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+  RETURNED
+  PARTIALLY_FULFILLED
+  PARTIALLY_CANCELLED
+  PARTIALLY_RETURNED
+}
+
+enum OrderPaymentStatus {
+  UNPAID
+  PENDING
+  PAID
+  FAILED
+  CANCELLED
+  PARTIALLY_REFUNDED
+  REFUNDED
+  COD_PENDING
+  COD_COLLECTED
+}
+
+enum DeliveryAssignmentStatus {
+  ASSIGNED
+  ACCEPTED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum DeliveryAssigneeType {
+  STAFF
+  COURIER
+  OTHER
+}

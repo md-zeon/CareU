@@ -15,7 +15,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | B | Authentication basics | Already in place | in-progress |
 | C | Money primitives and test baseline | Already in place | existing |
 | D | Catalog menu facade (placeholder) | Already in place | existing |
-| 1 | Marketplace domain model | Foundation | planned |
+| 1 | Marketplace domain model | Foundation | in-progress |
 | 2 | Roles, permissions, and access control | Foundation | planned |
 | 3 | Media storage and secure file handling | Foundation | planned |
 | 4 | CareU first party shop and platform bootstrap | Slice 1 | planned |
@@ -60,10 +60,23 @@ Static seeded category and menu data served behind a cache facade for the storef
 
 ## Foundations
 
-### 1. Marketplace domain model · needs a decision
+### 1. Marketplace domain model · in-progress
 Define the core records for sellers, shops, CareU as first party, categories, products and variants, inventory, carts, orders, payments, shipments, and audit history so every slice shares one consistent model.
 **Done when:** the marketplace entities, relationships, and key constraints are recorded in a spec and the schema can support later slices without breaking rewrites.
-- [ ] Design it (spec): `/architect marketplace domain model`
+spec [0001](../specs/0001-marketplace-domain-model/index.md)
+code in `prisma/schema/enums.prisma`, `prisma/schema/seller.prisma`, `prisma/schema/catalog.prisma`, `prisma/schema/inventory.prisma`, `prisma/schema/customer.prisma`, `prisma/schema/order.prisma`, `prisma/schema/payment.prisma`, `prisma/schema/trust.prisma`, `prisma/schema/auth.prisma`, `prisma/migrations/20261112074041_marketplace_domain_model`
+- [x] Design it (spec): `/architect marketplace domain model`
+- [x] Build it: `/develop marketplace domain model`
+  - [x] Milestone 1: add shared enums and core identity/shop schema (`SellerApplication`, `SellerVerificationDocument`, `Shop`, `ShopMembership`) with ownership and status fields, satisfies **AC-1**, **AC-8**
+  - [x] Milestone 2: add catalog and sellable offer schema (`Category`, `CategoryAttribute`, `Product`, `ProductVariant`, `Listing`, `ListingVariant`, `ListingMedia`) with shared and unique listing support, satisfies **AC-2**, **AC-8**
+  - [x] Milestone 3: add order, fulfillment, inventory, reservation, and persisted customer records (parent `Order`, per shop `Shipment`/`OrderItem`, histories, stock models, `SavedAddress`, `Wishlist`) with snapshots and scope anchors, satisfies **AC-3**, **AC-4**, **AC-8**, **AC-9**
+  - [x] Milestone 4: add payment, money, COD reconciliation, trust, operations, and audit models, then review constraints/indexes and create/verify the migration and generated client, satisfies **AC-5**, **AC-6**, **AC-7**, **AC-8**, **AC-9**
+  - [x] Rework: apply 2026-11-12 review findings (money as BIGINT poisha, snapshot/cascade/history/integrity fixes, updated migration/spec/tests)
+- [x] Rework: apply 2026-11-12 rereview integrity top up (rating and item status guards, shipment uniqueness, terminal attribution, stock movement idempotency, typed support author, default uniqueness)
+- [x] Verify it: `/check verify marketplace domain model`
+- [x] Test it: `/test marketplace domain model`
+- [x] Review it (fresh model): `/check review marketplace domain model`
+- [x] Document it: `/document marketplace domain model`
 
 ### 2. Roles, permissions, and access control · needs a decision
 Define and enforce roles for customers, seller owners and staff, and platform staff, with shop scoped and platform scoped permissions checked on the server for every protected action.

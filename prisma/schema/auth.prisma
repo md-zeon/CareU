@@ -11,6 +11,37 @@ model User {
     sessions            Session[]
     accounts            Account[]
 
+    sellerApplications          SellerApplication[] @relation("SellerApplicationApplicant")
+    reviewedSellerApplications  SellerApplication[] @relation("SellerApplicationReviewer")
+    ownedShops                  Shop[]              @relation("ShopOwner")
+    shopMemberships             ShopMembership[]    @relation("ShopMember")
+    invitedShopMemberships      ShopMembership[]    @relation("ShopMembershipInviter")
+    createdProducts             Product[]           @relation("ProductCreator")
+    stockMovements              StockMovement[]     @relation("StockMovementActor")
+    savedAddresses              SavedAddress[]
+    wishlist                    Wishlist?
+    orders                      Order[]             @relation("CustomerOrders")
+    orderStatusChanges          OrderStatusHistory[] @relation("OrderStatusActor")
+    orderPaymentStatusChanges   OrderPaymentStatusHistory[] @relation("OrderPaymentStatusActor")
+    shipmentStatusChanges       ShipmentStatusHistory[] @relation("ShipmentStatusActor")
+    proofsOfDeliveryCaptured    ProofOfDelivery[]   @relation("ProofOfDeliveryCapturer")
+    refundsRequested            Refund[]            @relation("RefundRequester")
+    refundsApproved             Refund[]            @relation("RefundApprover")
+    financialLedgerActions      FinancialLedgerEntry[] @relation("FinancialLedgerActor")
+    codReconciliationActions    CODReconciliationRecord[] @relation("CODReconciliationActor")
+    codReconciliationResolutions CODReconciliationRecord[] @relation("CODReconciliationResolver")
+    payoutBatchesApproved       PayoutBatch[]       @relation("PayoutBatchApprover")
+    reviews                     Review[]
+    supportCases                SupportCase[]       @relation("SupportCaseCustomer")
+    assignedSupportCases        SupportCase[]       @relation("SupportCaseAssignee")
+    supportCaseStatusChanges    SupportCaseStatusHistory[] @relation("SupportCaseStatusActor")
+    supportMessages             SupportMessage[]    @relation("SupportMessageAuthor")
+    disputesOpened              Dispute[]           @relation("DisputeOpener")
+    disputesResolved            Dispute[]           @relation("DisputeResolver")
+    notificationStatusChanges   NotificationStatusHistory[] @relation("NotificationStatusActor")
+    notifications               Notification[]      @relation("NotificationRecipient")
+    auditLogs                   AuditLog[]          @relation("AuditLogActor")
+
     @@unique([email])
     @@unique([phoneNumber])
     @@map("user")

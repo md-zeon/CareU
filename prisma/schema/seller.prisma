@@ -1,0 +1,104 @@
+// Seller applications, shops, and shop memberships
+
+model SellerApplication {
+  id               String                    @id @default(cuid())
+  applicantUserId  String
+  applicantUser    User                      @relation("SellerApplicationApplicant", fields: [applicantUserId], references: [id], onDelete: Restrict)
+  type             SellerApplicationType
+  status           SellerApplicationStatus   @default(DRAFT)
+  businessName     String?
+  legalName        String?
+  phone            String?
+  email            String?
+  addressLine1     String?
+  addressLine2     String?
+  district         String?
+  division         String?
+  postalCode       String?
+  profileData      Json?
+  submittedAt      DateTime?
+  reviewedByUserId String?
+  reviewedByUser   User?                     @relation("SellerApplicationReviewer", fields: [reviewedByUserId], references: [id], onDelete: SetNull)
+  reviewedAt       DateTime?
+  rejectionReason  String?
+  reviewNotes      String?
+  createdAt        DateTime                  @default(now())
+  updatedAt        DateTime                  @updatedAt
+  documents        SellerVerificationDocument[]
+
+  @@index([applicantUserId])
+  @@index([status])
+  @@map("seller_application")
+}
+
+model SellerVerificationDocument {
+  id                  String                           @id @default(cuid())
+  sellerApplicationId String
+  // Compliance records: retention periods are a pending policy, so a parent
+  // delete must never cascade them away. Age based deletion is explicit and audited.
+  sellerApplication   SellerApplication                @relation(fields: [sellerApplicationId], references: [id], onDelete: Restrict)
+  documentType        String
+  storageKey          String
+  mimeType            String?
+  sizeBytes           Int?
+  status              SellerVerificationDocumentStatus @default(PENDING)
+  reviewNotes         String?
+  createdAt           DateTime                         @default(now())
+  updatedAt           DateTime                         @updatedAt
+
+  @@index([sellerApplicationId])
+  @@index([status])
+  @@map("seller_verification_document")
+}
+
+model Shop {
+  id                       String                    @id @default(cuid())
+  ownerUserId              String
+  ownerUser                User                      @relation("ShopOwner", fields: [ownerUserId], references: [id], onDelete: Restrict)
+  slug                     String                    @unique
+  name                     String
+  isFirstParty             Boolean                   @default(false)
+  status                   ShopStatus                @default(PENDING)
+  isTrusted                Boolean                   @default(false)
+  approvedAt               DateTime?
+  suspendedAt              DateTime?
+  suspensionReason         String?
+  pausedAt                 DateTime?
+  metadata                 Json?
+  createdAt                DateTime                  @default(now())
+  updatedAt                DateTime                  @updatedAt
+  memberships              ShopMembership[]
+  listings                 Listing[]
+  stockLocations           StockLocation[]
+  shipments                Shipment[]
+  orderItems               OrderItem[]
+  financialLedgerEntries   FinancialLedgerEntry[]
+  payoutItems              PayoutItem[]
+  codReconciliationRecords CODReconciliationRecord[]
+  supportCases             SupportCase[]
+  disputes                 Dispute[]
+  auditLogs                AuditLog[]
+
+  @@unique([ownerUserId])
+  @@index([status])
+  @@index([isFirstParty])
+  @@map("shop")
+}
+
+model ShopMembership {
+  id              String               @id @default(cuid())
+  shopId          String
+  shop            Shop                 @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User                 @relation("ShopMember", fields: [userId], references: [id], onDelete: Cascade)
+  membershipRole  String?
+  status          ShopMembershipStatus @default(INVITED)
+  invitedByUserId String?
+  invitedByUser   User?                @relation("ShopMembershipInviter", fields: [invitedByUserId], references: [id], onDelete: SetNull)
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+
+  @@unique([shopId, userId])
+  @@index([userId])
+  @@map("shop_membership")
+}

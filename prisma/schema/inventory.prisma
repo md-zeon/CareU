@@ -1,0 +1,88 @@
+// Inventory, stock movements, and reservations
+
+model StockLocation {
+  id          String            @id @default(cuid())
+  shopId      String?
+  shop        Shop?             @relation(fields: [shopId], references: [id], onDelete: Restrict)
+  name        String
+  type        StockLocationType @default(PLATFORM)
+  // At most one default location per scope. Partial unique indexes in the
+  // migration enforce one default per shop and one platform default.
+  isDefault   Boolean           @default(false)
+  address     Json?
+  metadata    Json?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  balances    InventoryBalance[]
+  movements   StockMovement[]
+  reservations StockReservation[]
+
+  @@index([shopId])
+  @@map("stock_location")
+}
+
+model InventoryBalance {
+  id                String         @id @default(cuid())
+  listingVariantId  String
+  listingVariant    ListingVariant @relation(fields: [listingVariantId], references: [id], onDelete: Cascade)
+  stockLocationId   String
+  stockLocation     StockLocation  @relation(fields: [stockLocationId], references: [id], onDelete: Cascade)
+  onHand            Int            @default(0)
+  reserved          Int            @default(0)
+  lowStockThreshold Int?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  @@unique([listingVariantId, stockLocationId])
+  @@index([stockLocationId])
+  @@map("inventory_balance")
+}
+
+model StockMovement {
+  id               String             @id @default(cuid())
+  listingVariantId String
+  listingVariant   ListingVariant     @relation(fields: [listingVariantId], references: [id], onDelete: Restrict)
+  stockLocationId  String
+  stockLocation    StockLocation      @relation(fields: [stockLocationId], references: [id], onDelete: Restrict)
+  reason           StockMovementReason
+  quantityDelta    Int
+  // Postings that must never apply twice (sale, return, receipt, adjustment)
+  // supply a stable key. InventoryBalance stays the authoritative on hand value.
+  idempotencyKey   String?            @unique
+  referenceType    String?
+  referenceId      String?
+  actorUserId      String?
+  actorUser        User?              @relation("StockMovementActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  note             String?
+  createdAt        DateTime           @default(now())
+
+  @@index([listingVariantId])
+  @@index([stockLocationId])
+  @@index([referenceType, referenceId])
+  @@index([createdAt])
+  @@map("stock_movement")
+}
+
+model StockReservation {
+  id               String                 @id @default(cuid())
+  checkoutKey      String?
+  orderId          String?
+  order            Order?                 @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  listingVariantId String
+  listingVariant   ListingVariant         @relation(fields: [listingVariantId], references: [id], onDelete: Restrict)
+  stockLocationId  String
+  stockLocation    StockLocation          @relation(fields: [stockLocationId], references: [id], onDelete: Restrict)
+  quantity         Int
+  status           StockReservationStatus @default(ACTIVE)
+  expiresAt        DateTime
+  idempotencyKey   String
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
+
+  @@unique([idempotencyKey])
+  @@index([checkoutKey])
+  @@index([orderId])
+  @@index([listingVariantId])
+  @@index([status, expiresAt])
+  @@map("stock_reservation")
+}
