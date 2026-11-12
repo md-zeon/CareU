@@ -46,9 +46,9 @@ accounting. See "Product architecture" below.
 `tsx`, any test runner.
 
 **Targets** (not yet provisioned): Vercel (`sin1`) behind Cloudflare; Neon
-Postgres (`aws-ap-southeast-1`) — **runtime driver is a pending decision**;
+Postgres (`aws-ap-southeast-1`) — runtime driver: **`@prisma/adapter-pg` over the pooled endpoint** (decided); `DIRECT_DATABASE_URL` for migrations remains optional if needed;
 SSLCommerz for online payments — **confirmed** initial online gateway;
-product media storage — **pending decision** (Cloudflare R2 vs. Cloudinary);
+product media storage — **Cloudflare R2** (decided) for public product media and private, access controlled documents;
 Bunny Stream for video. **Local dev runs against PostgreSQL 18.1 on
 `localhost:5432`, database `careu_db`.**
 
@@ -63,10 +63,7 @@ Bunny Stream for video. **Local dev runs against PostgreSQL 18.1 on
 - `npm run db:deploy` — `prisma migrate deploy`
 - `npm run db:push` — `prisma db push` (dev-only; never on production)
 - `npm run studio` — `prisma studio`
-- **No test script and no test runner exist.** Add one before claiming test
-  coverage; `npm run test` must exist and pass before a change is "done" if
-  the change touches permissions, inventory, payments, orders, refunds or
-  commissions.
+- `npm run test` — Node 24 built-in test runner (`node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test "./tests/**/*.test.ts"`). T1 (money and rounding) is implemented; T2–T7 are declared as skipped stubs until their owning milestones replace them with real tests. A passing run with skipped gates does not satisfy those gates. Before a change is "done", `npm run test` must pass for work that touches permissions, inventory, payments, orders, refunds or commissions, and the gate that owns that area must be implemented and passing.
 
 ## Verified status — do not overstate
 
@@ -86,7 +83,7 @@ helper; `lib/catalog/menu.ts` (static seed data behind a `'use cache'` facade);
 **Does not exist yet:** every marketplace domain model, RBAC, admin area,
 seller dashboard, checkout, stock reservation, payment/IPN, fulfilment,
 delivery, coupons, tax, notifications, support cases, disputes, settlements,
-audit log, real search, media/storage integration, seed script, and tests.
+audit log, real search, media/storage integration, a seed script, and full test coverage beyond the T1 money gate (acceptance gates T2–T7 remain pending stubs).
 The only Prisma models are the five Better Auth ones in
 `prisma/schema/auth.prisma`.
 
@@ -192,6 +189,9 @@ The only Prisma models are the five Better Auth ones in
   permission automatically.
 - Audit every sensitive administrative, financial, pricing, inventory,
   seller-trust, moderation and settlement action.
+- Site content (CMS) editing is limited to authorized company roles, and theme
+  customization is limited to super admins. Enforce these checks on the server
+  and audit content and theme changes.
 
 ### Commerce integrity
 
@@ -268,10 +268,9 @@ The only Prisma models are the five Better Auth ones in
   cooperating crawlers. Private order information (and every record or
   document behind it) must be protected by server-side authorization: resolve
   the session on every read and check that the actor owns the order or holds
-  the required permission. For a public order-tracking flow, use a secure,
-  scoped, time-limited token that grants access to exactly one order and
-  nothing else. An unguessable URL, a token that is not scope-limited, or
-  `noindex` is never an access boundary.
+  the required permission. Order tracking requires sign in; resolve the session
+  and check ownership or the required permission on every read. An unguessable
+  URL or `noindex` is never an access boundary.
 - Validate before shipping: metadata presence, canonical correctness,
   sitemap validity, redirect chains and status codes, structured-data
   well-formedness. Do not add a third-party SEO library unless it clearly beats
@@ -299,6 +298,10 @@ The only Prisma models are the five Better Auth ones in
   plan before adding one.
 - Use caching and revalidation intentionally for public catalogue content.
   Do not disable caching everywhere as a blanket safety measure.
+- Content management and theme customization must not degrade public page
+  performance: serve published content and theme settings through server
+  rendered, cached paths with intentional revalidation. Never add per request
+  client fetches that block rendering or bypass the caching strategy.
 - Keep checkout, stock reservation and financial operations correct under
   concurrent requests.
 - Avoid excessive serverless invocations and repeated authentication or
@@ -325,7 +328,7 @@ The only Prisma models are the five Better Auth ones in
   payments, orders, refunds or settlements.
 - Add tests for permissions, inventory concurrency, payment callbacks, order
   totals, commission calculations, refunds and critical user journeys.
-- Run `npm run lint`, `npm run typecheck`, `npm run test` (once it exists) and
+- Run `npm run lint`, `npm run typecheck`, `npm run test` and
   `npm run build` before considering work complete.
 - Document architectural decisions and significant trade-offs.
 
@@ -355,7 +358,7 @@ The only Prisma models are the five Better Auth ones in
 - Least-privilege authorization throughout; backend enforcement everywhere.
 - Private order information is protected by server-side authorization on every
   read: resolve the session, then check ownership or the required permission.
-  A public order-tracking link must use a secure, scoped, time-limited token.
+  Order tracking requires sign in (no public token link at launch).
   `robots.txt` and `noindex` are discovery hints and are never a security
   boundary.
 
@@ -481,51 +484,40 @@ decisions" below.
   cancellations, returns, commissions, payout balances) kept separate from
   CareU first-party reporting and cost/margin data.
 
-### Pending decisions — ask, do not invent
+### Decisions and open items — ask, do not invent
 
-Undecided at the time of writing. These are **business policies and
-infrastructure choices**, not missing capabilities — the capabilities they
-govern are listed above as confirmed; their values, rules and thresholds are
-not. Do not hard-code a value or pick a default in code without explicit
-confirmation.
+These are **business policies and infrastructure choices**. Capabilities are
+confirmed elsewhere; values, rules and thresholds are not unless recorded as
+decided below. Do not hard-code a value or pick a default in code without
+explicit confirmation.
 
-- Commission rates per category, and who bears commission on discounted items
-  (CareU-funded vs seller-funded).
-- Return window and eligibility per category; who pays return shipping; is
-  return shipping refunded.
-- Refund policy: partial refunds allowed, maximum refund window after
-  delivery, acceptable COD refund payout methods.
-- Delivery pricing model and coverage (all districts vs. Dhaka-first), free
-  delivery threshold, and whether the buyer, seller or platform bears it.
-- COD remittance *mechanics* (per-seller receivable vs. netted into a payout
-  batch) — the mechanism is open, but **ownership is confirmed: CareU owns the
-  entire COD workflow end-to-end (D-08/D-32)**, including courier-held cash,
-  investigation of shortages, and any eventual loss allocation (which must be
-  explicit, reasoned, evidenced and audited — never an automatic seller debt
-  or a confirmed CareU expense).
-- Tax/VAT at launch: applicability, inclusive vs exclusive, integer-BDT
-  rounding.
-- Display currency scope at launch and the FX rate source.
-- Initial staff roles and their exact permission sets (platform admin,
-  moderator, customer support, finance, catalogue/pricing, inventory,
-  delivery, procurement).
-- Seller onboarding document list and retention period; payout cadence,
-  minimum threshold and destination method (bank vs mobile wallet).
-- Review moderation (auto-publish vs pre-moderation).
-- Whether serial/warranty-tracked products are in launch scope.
-- Notification channels (email only vs email + SMS).
-- Categories with special legal/compliance requirements (cosmetics, baby
-  food, medical devices, electronics certification).
-- Record-retention periods for orders, financial records and audit logs under
-  BD requirements.
-- Public order tracking without login (secure, scoped, time-limited token vs.
-  sign-in required).
-- Neon runtime driver: `@prisma/adapter-pg` over the pooled endpoint vs.
-  `@prisma/adapter-neon` — **pending decision**; and whether to add
-  `DIRECT_DATABASE_URL` for migrations (currently only `url` is configured).
-- Storage vendor for product media and seller documents: Cloudflare R2 vs.
-  Cloudinary — **pending decision**. R2 satisfies private storage + signed
-  URLs; neither may be hard-coded until this is approved.
+**Decided (recorded):**
+- **Build approach and roadmap:** Tracer Bullet. The living roadmap is `docs/scope/scope.md` (see "Build approach").
+- **Neon runtime driver:** keep `@prisma/adapter-pg` over the pooled endpoint. Adding `DIRECT_DATABASE_URL` for migrations remains optional if needed.
+- **Storage vendor:** Cloudflare R2 for public product media and private, access controlled documents (seller verification, proof of delivery) served through controlled access such as signed URLs.
+- **Notification channels:** email and in app, with history and status.
+- **Order tracking access:** sign in required (no public token link at launch).
+- **Review moderation:** publish verified purchase reviews, then moderate (reports and staff review can act on problems).
+- **Serial/warranty tracked products:** not in launch scope (design so they can be added later).
+- **Display currency and FX:** BDT only at launch; keep the system ready for more currencies later.
+- **Tax/VAT at launch:** do not apply a tax charge at checkout yet; keep tax fields and rule support ready so VAT can be turned on later once rates and treatment are confirmed.
+- **Commission on discounted items:** commission impact follows who funds the discount (CareU funded discounts do not reduce the seller commission base; seller funded discounts use the seller's discounted amount). **Commission rates per category remain pending.**
+- **COD remittance mechanics:** net into payout batches with clear records (CareU ownership of the full COD workflow remains confirmed as stated above).
+- **Delivery coverage at launch:** all districts from launch. Delivery charges remain configurable (by destination, shipment, method, weight, or order value) and are recorded per shipment.
+- **Seller payout destination:** bank transfer and mobile wallet (exact method recorded per payout). **Payout cadence and minimum threshold remain pending.**
+- **Initial staff role areas:** platform admin, catalogue and pricing, inventory and procurement, delivery operations, customer support, and finance/settlements (kept separate, especially support vs finance). Exact permission sets will be refined in the RBAC spec.
+- **Seller onboarding documents (provisional starter list):** individual sellers: national ID copy, verified phone, and a selfie or profile photo. Business sellers: trade license, business address proof, and authorized person's national ID copy (plus tax or registration numbers if available). Keep all private with controlled access. **Retention period remains pending** until legal and operations confirm it.
+- **Categories with special legal/compliance needs:** flag and keep configurable; require admin review for flagged categories before launch (final list not hard coded).
+- **Record retention:** retention periods must be configurable per record type and kept long enough for legal, tax, and dispute needs. **Exact periods remain pending** under Bangladesh requirements. Keep anonymization rules as already stated.
+
+**Still pending (do not invent):**
+- Commission rates per category.
+- Return window and eligibility per category; who pays return shipping; whether return shipping is refunded.
+- Refund policy details: partial refunds allowed or not, maximum refund window after delivery, and acceptable COD refund payout methods (keep confirmed rules: manual admin review, original method where supported, and verified COD refund records).
+- Delivery pricing details: free delivery threshold and whether the buyer, seller, or platform bears delivery cost in each case (charges remain configurable and recorded per shipment).
+- Payout cadence and minimum payout threshold.
+- Seller onboarding document retention period (and any additions to the provisional starter list).
+- Exact record retention periods for orders, financial records, and audit logs under Bangladesh requirements.
 
 ## Library policy
 
@@ -568,6 +560,26 @@ measurement scope and baseline are defined (see Performance).
 
 - Font: Hind Siliguri (Bangla + Latin).
 - Style: Base UI + Vega preset. Colors: placeholder (neutral) — TBD.
+
+## Reference sites (inspiration)
+
+Use these as inspiration to compare against when planning or designing features. They are not requirements to copy. When running `/scope` or `/architect`, consider whether any useful pattern or feature from these sites should be included.
+
+- **Masari Shop** — https://www.masarishop.com/ (marketplace/storefront reference).
+- **Flannels** — https://www.flannels.com/ (fashion retail storefront reference).
+- **Aniq UI, Next.js E-Commerce Admin Dashboard Template (demo)** — https://www.aniq-ui.com/en/demo?url=https://ecommerce-clothes-1-admin.aniq-ui.com/en/dashboard&name=Next.js+E-Commerce+Admin+Dashboard+Template&slug=next-js-ecommerce-admin-dashboard-template&id=23 (admin/dashboard UI reference; especially liked for dashboard UI and overall UI/UX).
+- **Aniq UI, Next.js Fashion E-Commerce Storefront Template (demo)** — https://www.aniq-ui.com/en/demo?url=https://ecommerce-clothes-1.aniq-ui.com/en/auth/login&name=Next.js+Fashion+E-Commerce+Storefront+Template&slug=next-js-fashion-ecommerce-storefront-template&id=22 (storefront/shop page UI reference; especially liked for storefront shop page UI and overall UI/UX).
+
+## Context files
+
+- [lib/money/AGENTS.md](lib/money/AGENTS.md): integer-poisha money primitives, basis-point rounding, largest-remainder allocation, and discount pipeline
+- [tests/AGENTS.md](tests/AGENTS.md): test runner setup, seven acceptance gates (T1–T7), and rules for when a gate must pass before a milestone is done
+
+## Build approach
+
+Tracer Bullet: prove one thin, real end to end thread through every layer, then thicken it slice by slice.
+
+The living feature roadmap and current status live in `docs/scope/scope.md`. Treat that file as the source for what to build, in what order. Keep this file for durable rules, architecture constraints, and confirmed context.
 
 ## Working with this file
 
