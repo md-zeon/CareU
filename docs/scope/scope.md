@@ -15,7 +15,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | B | Authentication basics | Already in place | in-progress |
 | C | Money primitives and test baseline | Already in place | existing |
 | D | Catalog menu facade (placeholder) | Already in place | existing |
-| 1 | Marketplace domain model | Foundation | in-progress |
+| 1 | Marketplace domain model | Foundation | done |
 | 2 | Roles, permissions, and access control | Foundation | planned |
 | 3 | Media storage and secure file handling | Foundation | planned |
 | 4 | CareU first party shop and platform bootstrap | Slice 1 | planned |
@@ -60,7 +60,7 @@ Static seeded category and menu data served behind a cache facade for the storef
 
 ## Foundations
 
-### 1. Marketplace domain model · in-progress
+### 1. Marketplace domain model · done
 Define the core records for sellers, shops, CareU as first party, categories, products and variants, inventory, carts, orders, payments, shipments, and audit history so every slice shares one consistent model.
 **Done when:** the marketplace entities, relationships, and key constraints are recorded in a spec and the schema can support later slices without breaking rewrites.
 spec [0001](../specs/0001-marketplace-domain-model/index.md)

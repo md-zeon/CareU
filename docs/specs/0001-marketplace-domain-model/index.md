@@ -1,7 +1,7 @@
 # 0001. Marketplace domain model
 
 **Date**: 2026-11-12
-**Status**: In Progress (corrected after review 2026-11-12)
+**Status**: Accepted
 
 ## Summary
 

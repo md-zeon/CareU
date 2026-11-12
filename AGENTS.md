@@ -29,10 +29,10 @@ accounting. See "Product architecture" below.
 
 ## Stack
 
-**Installed and verified** (`package.json` @ commit `5524e2c`):
+**Installed and verified** (`package.json` @ commit `eeac17c`):
 
-- Next.js 16.4 (App Router, TypeScript, Turbopack), React 19.3
-- `cacheComponents: true` + `partialPrefetching: true` in `next.config.ts`
+- Next.js 16.4.6 (App Router, TypeScript, Turbopack), React 19.3
+- `cacheComponents: true` + `partialPrefetching: true` + `experimental.agentUpgrade: "security"` in `next.config.ts`
 - Tailwind CSS v4 + shadcn/ui on **Base UI** primitives (`base-vega` style)
 - next-intl 4.14 — locales `en` (default) + `bn`, `localePrefix: 'always'`
   (next-intl's default; `lib/i18n/routing.ts` does not set it explicitly)
@@ -59,11 +59,11 @@ Bunny Stream for video. **Local dev runs against PostgreSQL 18.1 on
 - `npm run lint` — ESLint (`eslint.config.mjs`, `eslint-config-next` core-web-vitals + typescript)
 - `npm run typecheck` — `tsc --noEmit` (script exists)
 - `npm run generate` — `prisma generate` (also runs on `postinstall`)
-- `npm run migrate` — `prisma migrate dev`
+- `npm run migrate` — `prisma migrate dev` (interactive terminal only; in this non interactive environment generate SQL with `prisma migrate diff --from-config-datasource --to-schema prisma/schema --script`, then apply with `npm run db:deploy`)
 - `npm run db:deploy` — `prisma migrate deploy`
 - `npm run db:push` — `prisma db push` (dev-only; never on production)
 - `npm run studio` — `prisma studio`
-- `npm run test` — Node 24 built-in test runner (`node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test "./tests/**/*.test.ts"`). T1 (money and rounding) is implemented; T2–T7 are declared as skipped stubs until their owning milestones replace them with real tests. A passing run with skipped gates does not satisfy those gates. Before a change is "done", `npm run test` must pass for work that touches permissions, inventory, payments, orders, refunds or commissions, and the gate that owns that area must be implemented and passing.
+- `npm run test` — Node 24 built-in test runner (`node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test "./tests/**/*.test.ts"`). T1 (money and rounding) and the marketplace schema contract test (`marketplace-domain-model.test.ts`) are implemented; T2–T7 are declared as skipped stubs until their owning milestones replace them with real tests. A passing run with skipped gates does not satisfy those gates. Before a change is "done", `npm run test` must pass for work that touches permissions, inventory, payments, orders, refunds or commissions, and the gate that owns that area must be implemented and passing.
 
 ## Verified status — do not overstate
 
@@ -72,7 +72,7 @@ next-intl (`en`/`bn`, locale from `next/root-params`); Hind Siliguri + Inter via
 `next/font`; storefront header (announcement bar, mega menu, GET-form search,
 mobile drawer), footer; session-aware `AccountArea` behind `<Suspense>`;
 Better Auth (phone OTP + email OTP, DB-backed rate limiting, cookie cache);
-Prisma 7 + pg adapter + one applied migration; `formatPrice()` integer-BDT
+Prisma 7 + pg adapter + four applied migrations; `formatPrice()` integer-BDT
 helper; `lib/catalog/menu.ts` (static seed data behind a `'use cache'` facade);
 `lib/provider/{email,sms}.ts` (console stubs that refuse to run in production).
 
@@ -80,12 +80,16 @@ helper; `lib/catalog/menu.ts` (static seed data behind a `'use cache'` facade);
 `/wishlist`, `/account`, `/order/track`, `/login`, `/register` — all render
 `Placeholder.message`. `lib/store/counts.ts` returns `0`.
 
-**Does not exist yet:** every marketplace domain model, RBAC, admin area,
-seller dashboard, checkout, stock reservation, payment/IPN, fulfilment,
+**Schema only, no marketplace features yet:** the domain model exists as
+Prisma schema, migrations and a contract test, covering sellers, shops,
+catalogue, inventory, orders, payments, COD, payouts, trust and audit
+records. No marketplace behaviour ships with it. Still to build: RBAC, admin
+area, seller dashboard, checkout, stock reservation, payment/IPN, fulfilment,
 delivery, coupons, tax, notifications, support cases, disputes, settlements,
-audit log, real search, media/storage integration, a seed script, and full test coverage beyond the T1 money gate (acceptance gates T2–T7 remain pending stubs).
-The only Prisma models are the five Better Auth ones in
-`prisma/schema/auth.prisma`.
+audit logging, real search, media/storage integration, and a seed script.
+Full test coverage beyond the T1 money gate and the schema contract test is
+pending (acceptance gates T2–T7 remain skipped stubs). See
+`docs/specs/0001-marketplace-domain-model/index.md`.
 
 ## Layout
 
@@ -102,7 +106,12 @@ The only Prisma models are the five Better Auth ones in
 - `node_modules/next/dist/docs/` — authoritative docs for this Next version.
 - `prisma/schema/` — multi-file Prisma schema **directory**:
   - `schema.prisma` — generator + datasource only (no models).
-  - `auth.prisma` — the Better Auth models.
+  - `auth.prisma` — the Better Auth models plus their marketplace back relations.
+  - `enums.prisma` — shared marketplace enums.
+  - `seller.prisma`, `catalog.prisma`, `inventory.prisma`, `customer.prisma`,
+    `order.prisma`, `payment.prisma`, `trust.prisma` — marketplace models by domain.
+- `prisma/migrations/` — applied SQL history. Check constraints and partial
+  unique indexes that Prisma cannot express are hand authored here.
 - `prisma7.config.ts` — Prisma CLI config (root, next to `package.json`).
 - `lib/generated/prisma/` — generated client; **gitignored**, never edited.
 

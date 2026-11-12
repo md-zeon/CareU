@@ -11,6 +11,7 @@ The test suite uses Node 24's built-in test runner with native TypeScript type s
 | `README.md` | Acceptance gate registry (T1–T7), rules, ownership table, running instructions |
 | `money.test.ts` | T1 — Money and rounding (implemented and passing) |
 | `acceptance-gates.test.ts` | T2–T7 — Declared as skipped stubs; each owning milestone must replace the skip with real tests |
+| `marketplace-domain-model.test.ts` | Schema contract for spec 0001: money storage, snapshots, status separation, scope anchors, idempotency and the migration guards |
 
 ## Commands
 
