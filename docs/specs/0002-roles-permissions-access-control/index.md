@@ -1,7 +1,7 @@
 # 0002. Roles, permissions, and access control
 
 **Date**: 2026-11-12
-**Status**: In Progress
+**Status**: Accepted
 
 ## Summary
 

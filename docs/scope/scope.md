@@ -16,7 +16,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | C | Money primitives and test baseline | Already in place | existing |
 | D | Catalog menu facade (placeholder) | Already in place | existing |
 | 1 | Marketplace domain model | Foundation | done |
-| 2 | Roles, permissions, and access control | Foundation | in-progress |
+| 2 | Roles, permissions, and access control | Foundation | done |
 | 3 | Media storage and secure file handling | Foundation | planned |
 | 4 | CareU first party shop and platform bootstrap | Slice 1 | planned |
 | 5 | Seller onboarding and shop management | Slice 1 | planned |
@@ -78,12 +78,12 @@ code in `prisma/schema/enums.prisma`, `prisma/schema/seller.prisma`, `prisma/sch
 - [x] Review it (fresh model): `/check review marketplace domain model`
 - [x] Document it: `/document marketplace domain model`
 
-### 2. Roles, permissions, and access control · in-progress
+### 2. Roles, permissions, and access control · done
 Define and enforce roles for customers, seller owners and staff, and platform staff, with shop scoped and platform scoped permissions checked on the server for every protected action.
 **Done when:** the permission model is recorded in a spec and protected actions can be granted or denied by trusted server side roles and scopes.
-spec [0002](../specs/0002-roles-permissions-access-control/index.md) · code in `lib/authz/`, `app/api/authz/roles/route.ts`, `app/[locale]/(storefront)/forbidden/page.tsx`, `scripts/bootstrap-super-admin.ts`, `prisma/schema/rbac.prisma`, `prisma/migrations/20261112103000_roles_permissions_access_control`, `tests/authz-catalog.test.ts`, `tests/authz-milestone5.test.ts`, `tests/acceptance-gates.test.ts`
+spec [0002](../specs/0002-roles-permissions-access-control/index.md) · code in `lib/authz/`, `app/api/authz/roles/route.ts`, `app/[locale]/(storefront)/forbidden/page.tsx`, `scripts/bootstrap-super-admin.ts`, `prisma/schema/rbac.prisma`, `prisma/migrations/20261112103000_roles_permissions_access_control`, `tests/acceptance-gates.test.ts`, `tests/authz-catalog.test.ts`, `tests/authz-milestone5.test.ts`, `tests/authz-access-control.test.ts`
 - [x] Design it (spec): `/architect roles, permissions, and access control`
-- [ ] Build it: `/develop roles, permissions, and access control`
+- [x] Build it: `/develop roles, permissions, and access control`
   - [x] Milestone 1: add `PlatformRole`, `PlatformRoleGrantSource`, and `ShopRole` enums, the `PlatformRoleAssignment` model with grant/revoke history, and `ShopMembership` role and lifecycle fields, with hand authored partial unique indexes for live assignments and live memberships, satisfies **AC-1**
   - [x] Milestone 2: write the typed permission catalog, role bundles, `OWNER_BUNDLE`, super admin exclusive set, CareU shop mapping, and resource access matrix with a completeness test, satisfies **AC-2**
   - [x] Milestone 3: resolve effective access from the session plus the database (`getActor`, live platform roles, ACTIVE membership, owner derivation, verified contact, shop status gate) and implement the evaluator, guards, and `AuthorizationDecision` adapters, satisfies **AC-3**, **AC-4**, **AC-5**, **AC-7**, **AC-10**
@@ -92,7 +92,7 @@ spec [0002](../specs/0002-roles-permissions-access-control/index.md) · code in 
 - [x] Verify it: `/check verify roles, permissions, and access control`
 - [x] Test it: `/test roles, permissions, and access control`
 - [x] Review it (fresh model): `/check review roles, permissions, and access control`
-- [ ] Document it: `/document roles, permissions, and access control`
+- [x] Document it: `/document roles, permissions, and access control` (PR description prepared)
 
 ### 3. Media storage and secure file handling · needs a decision
 Design and integrate Cloudflare R2 (decided) for public product media and for private documents such as seller verification files and proof of delivery, with safe uploads and controlled access.

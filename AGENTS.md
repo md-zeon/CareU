@@ -61,7 +61,7 @@ Bunny Stream for video. **Local dev runs against PostgreSQL 18.1 on
 - `npm run db:deploy` — `prisma migrate deploy`
 - `npm run db:push` — `prisma db push` (dev-only; never on production)
 - `npm run studio` — `prisma studio`
-- `npm run test` — Node 24 built-in test runner (`node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test "./tests/**/*.test.ts"`). T1 (money and rounding) and the marketplace schema contract test (`marketplace-domain-model.test.ts`) are implemented; T2–T7 are declared as skipped stubs until their owning milestones replace them with real tests. A passing run with skipped gates does not satisfy those gates. Before a change is "done", `npm run test` must pass for work that touches permissions, inventory, payments, orders, refunds or commissions, and the gate that owns that area must be implemented and passing.
+- `npm run test` - Node 24 built-in test runner (`node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test "./tests/**/*.test.ts"`). T1 (money and rounding), T2 (authorization and scope isolation), marketplace schema contract tests, and authz tests are implemented; T3-T7 are declared as skipped stubs until their owning milestones replace them with real tests. A passing run with skipped gates does not satisfy those gates. Before a change is "done", `npm run test` must pass for work that touches permissions, inventory, payments, orders, refunds or commissions, and the gate that owns that area must be implemented and passing.
 
 ## Verified status — do not overstate
 
@@ -78,16 +78,21 @@ helper; `lib/catalog/menu.ts` (static seed data behind a `'use cache'` facade);
 `/wishlist`, `/account`, `/order/track`, `/login`, `/register` — all render
 `Placeholder.message`. `lib/store/counts.ts` returns `0`.
 
-**Schema only, no marketplace features yet:** the domain model exists as
-Prisma schema, migrations and a contract test, covering sellers, shops,
+**Schema and foundation, limited marketplace behaviour yet:** the domain model exists as
+Prisma schema, migrations and contract tests, covering sellers, shops,
 catalogue, inventory, orders, payments, COD, payouts, trust and audit
-records. No marketplace behaviour ships with it. Still to build: RBAC, admin
-area, seller dashboard, checkout, stock reservation, payment/IPN, fulfilment,
-delivery, coupons, tax, notifications, support cases, disputes, settlements,
-audit logging, real search, media/storage integration, and a seed script.
-Full test coverage beyond the T1 money gate and the schema contract test is
-pending (acceptance gates T2–T7 remain skipped stubs). See
-`docs/specs/0001-marketplace-domain-model/index.md`.
+records. The authorization foundation is in place (spec 0002, `lib/authz/`,
+RBAC schema/migration, audited guards/actions, bootstrap, and a protected
+probe route), but it is not yet applied across marketplace flows. Still to
+build: admin area, seller dashboard, checkout, stock reservation,
+payment/IPN, fulfilment, delivery, coupons, tax, notifications, support
+cases, disputes, settlements, audit logging across marketplace flows, real
+search, media/storage integration, and a seed script.
+Full test coverage beyond the implemented gates (T1 money and T2
+authorization and scope isolation) and schema/authz tests is pending
+(acceptance gates T3-T7 remain skipped stubs). See
+`docs/specs/0001-marketplace-domain-model/index.md` and
+`docs/specs/0002-roles-permissions-access-control/index.md`.
 
 ## Layout
 
@@ -579,6 +584,7 @@ Use these as inspiration to compare against when planning or designing features.
 
 ## Context files
 
+- [lib/authz/AGENTS.md](lib/authz/AGENTS.md): roles, permissions, actor resolution, guards, audited authz actions, and rate limiting (spec 0002)
 - [lib/money/AGENTS.md](lib/money/AGENTS.md): integer-poisha money primitives, basis-point rounding, largest-remainder allocation, and discount pipeline
 - [tests/AGENTS.md](tests/AGENTS.md): test runner setup, seven acceptance gates (T1–T7), and rules for when a gate must pass before a milestone is done
 
