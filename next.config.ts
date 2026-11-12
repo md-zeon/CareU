@@ -7,6 +7,8 @@ const nextConfig: NextConfig = {
   /* config options here */
   experimental: {
     agentFeedback: true,
+    // Set by the Next.js security upgrade flow (`next upgrade --agent=security`).
+    agentUpgrade: "security",
   },
   cacheComponents: true,
   partialPrefetching: true,
