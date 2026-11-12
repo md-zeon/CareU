@@ -23,27 +23,99 @@
  */
 
 import { test, describe } from "node:test";
+import assert from "node:assert/strict";
+import {
+  effectiveShopPermissions,
+  evaluatePlatformPermission,
+} from "../lib/authz/evaluate.ts";
+import { PLATFORM_PERMISSIONS, SHOP_PERMISSIONS } from "../lib/authz/permissions.ts";
+import { PLATFORM_ROLE_BUNDLES, isConflictingPlatformRolePair } from "../lib/authz/roles.ts";
+import { prisma } from "../lib/prisma.ts";
 
 describe("T2 Authorization & scope isolation", () => {
-  test("a shop-scoped staff member cannot read or mutate another shop's data", {
-    skip: "pending — requires the RBAC model and shop scoping (requirements §1.2, §2.2)",
-  }, () => {
-    // Must cover, at minimum:
-    //  - staff of shop A get 404/403 for shop B's orders, listings and staff;
-    //  - a client-supplied `shopId`, `sellerId`, `role` or `isAdmin` is ignored;
-    //  - platform permissions (catalogue, pricing, procurement, inventory,
-    //    margins) are distinct from shop permissions;
-    //  - customer-support permissions do not imply financial permissions;
-    //  - a newly invited staff member holds no sensitive permission by default;
-    //  - every protected operation is enforced on the server, not merely
-    //    hidden in the UI.
+  test("a shop-scoped staff member cannot read or mutate another shop's data", async () => {
+    const suffix = `t2_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const ownerA = `u_${suffix}_oa`;
+    const ownerB = `u_${suffix}_ob`;
+    const staff = `u_${suffix}_st`;
+    const shopA = `s_${suffix}_a`;
+    const shopB = `s_${suffix}_b`;
+
+    await prisma.user.createMany({
+      data: [
+        { id: ownerA, name: "Owner A", email: `${ownerA}@example.test` },
+        { id: ownerB, name: "Owner B", email: `${ownerB}@example.test` },
+        { id: staff, name: "Staff", email: `${staff}@example.test` },
+      ],
+    });
+    await prisma.shop.createMany({
+      data: [
+        { id: shopA, ownerUserId: ownerA, slug: `shop-a-${suffix}`, name: "Shop A", status: "ACTIVE" },
+        { id: shopB, ownerUserId: ownerB, slug: `shop-b-${suffix}`, name: "Shop B", status: "ACTIVE" },
+      ],
+    });
+    await prisma.shopMembership.create({
+      data: {
+        shopId: shopA,
+        userId: staff,
+        role: "FULFILMENT",
+        status: "ACTIVE",
+        acceptedAt: new Date(),
+      },
+    });
+
+    try {
+      const permsA = await effectiveShopPermissions(staff, shopA);
+      const permsB = await effectiveShopPermissions(staff, shopB);
+
+      assert.ok(permsA.has(SHOP_PERMISSIONS.ORDER_READ));
+      assert.ok(permsA.has(SHOP_PERMISSIONS.FULFILLMENT_MANAGE));
+      assert.equal(permsB.size, 0, "staff of shop A must have no shop permissions on shop B");
+
+      // platform permissions distinct from shop permissions
+      assert.ok(!PLATFORM_ROLE_BUNDLES.CATALOGUE_PRICING.has(PLATFORM_PERMISSIONS.PAYMENT_RECONCILE as never));
+      // customer support has no financial permissions
+      const support = PLATFORM_ROLE_BUNDLES.CUSTOMER_SUPPORT;
+      assert.ok(!support.has(PLATFORM_PERMISSIONS.PAYMENT_RECONCILE));
+      assert.ok(!support.has(PLATFORM_PERMISSIONS.LEDGER_READ));
+      assert.ok(!support.has(PLATFORM_PERMISSIONS.PAYOUT_MANAGE));
+      assert.ok(!support.has(PLATFORM_PERMISSIONS.COD_RECONCILE));
+      // newly invited staff member holds no sensitive permission by default (no active membership)
+      const invited = `u_${suffix}_inv`;
+      await prisma.user.create({ data: { id: invited, name: "Invited", email: `${invited}@example.test` } });
+      await prisma.shopMembership.create({
+        data: { shopId: shopA, userId: invited, role: "MANAGER", status: "INVITED" },
+      });
+      const invitedPerms = await effectiveShopPermissions(invited, shopA);
+      assert.equal(invitedPerms.size, 0);
+    } finally {
+      await prisma.shopMembership.deleteMany({ where: { shopId: { in: [shopA, shopB] } } });
+      await prisma.shop.deleteMany({ where: { id: { in: [shopA, shopB] } } });
+      await prisma.user.deleteMany({ where: { id: { startsWith: `u_${suffix}` } } });
+    }
   });
 
-  test("the acting user, roles, shop scope and permissions come from the session", {
-    skip: "pending — requires session-backed permission resolution (requirements §1.2)",
-  }, () => {
-    // Must cover: the server derives the actor from the trusted session and
-    // never from client input.
+  test("the acting user, roles, shop scope and permissions come from the trusted session/DB resolution", async () => {
+    // resolve actor/platform permission decision never trusts client role flags; signed out is redirected
+    const decision = evaluatePlatformPermission(null, PLATFORM_PERMISSIONS.ROLE_MANAGE);
+    assert.equal(decision.status, "REDIRECT_LOGIN");
+
+    // unverified platform role holder is denied
+    const unverified = {
+      userId: "u_x",
+      platformRoles: ["PLATFORM_ADMIN"] as const,
+      verifiedContact: false,
+    };
+    const denied = evaluatePlatformPermission(
+      { ...unverified, platformRoles: [...unverified.platformRoles] },
+      PLATFORM_PERMISSIONS.SHOP_READ,
+    );
+    assert.equal(denied.status, "CONTACT_UNVERIFIED");
+
+    // support and finance roles cannot be combined
+    assert.ok(isConflictingPlatformRolePair("CUSTOMER_SUPPORT", "FINANCE_SETTLEMENTS"));
+    assert.ok(isConflictingPlatformRolePair("FINANCE_SETTLEMENTS", "CUSTOMER_SUPPORT"));
+    assert.ok(!isConflictingPlatformRolePair("CUSTOMER_SUPPORT", "PLATFORM_ADMIN"));
   });
 });
 

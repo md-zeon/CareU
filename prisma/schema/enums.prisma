@@ -1,4 +1,27 @@
-// Shared marketplace enums (spec 0001)
+// Shared marketplace enums (spec 0001, 0002)
+
+enum PlatformRole {
+  SUPER_ADMIN
+  PLATFORM_ADMIN
+  CATALOGUE_PRICING
+  INVENTORY_PROCUREMENT
+  DELIVERY_OPERATIONS
+  CUSTOMER_SUPPORT
+  FINANCE_SETTLEMENTS
+  TRUST_MODERATION
+}
+
+enum PlatformRoleGrantSource {
+  ADMIN
+  BOOTSTRAP
+}
+
+enum ShopRole {
+  MANAGER
+  CATALOGUE
+  FULFILMENT
+  SUPPORT
+}
 
 enum SellerApplicationType {
   INDIVIDUAL

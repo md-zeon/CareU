@@ -89,7 +89,14 @@ describe("Marketplace domain model schema contract (spec 0001, corrected)", () =
     assert.ok(hasToken(shop, "@@unique([ownerUserId])"));
 
     const mem = modelBlock(seller, "ShopMembership");
-    assert.ok(hasToken(mem, "@@unique([shopId, userId])"));
+    // Spec 0002 replaced the full unique with a partial unique live-membership index in migrations.
+    assert.ok(hasToken(mem, "role") && hasToken(mem, "ShopRole"));
+    assert.ok(hasToken(mem, "status") && hasToken(mem, "ShopMembershipStatus"));
+    assert.ok(hasToken(mem, "@@index([shopId, status])"));
+    assert.match(
+      migrations,
+      /CREATE UNIQUE INDEX "shop_membership_shop_user_live_unique_idx"\s+ON "shop_membership"\s*\("shopId",\s*"userId"\)\s+WHERE "status"\s*<>\s*'REMOVED'/,
+    );
   });
 
   test("AC-2: shared catalog and seller owned sellable offers", () => {

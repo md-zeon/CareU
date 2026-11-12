@@ -1,0 +1,23 @@
+// Platform role assignments and authorization records (spec 0002)
+
+model PlatformRoleAssignment {
+  id              String                   @id @default(cuid())
+  userId          String
+  user            User                     @relation("PlatformRoleHolder", fields: [userId], references: [id], onDelete: Restrict)
+  role            PlatformRole
+  grantSource     PlatformRoleGrantSource  @default(ADMIN)
+  grantedByUserId String?
+  grantedByUser   User?                    @relation("PlatformRoleGranter", fields: [grantedByUserId], references: [id], onDelete: Restrict)
+  grantedAt       DateTime                 @default(now())
+  revokedByUserId String?
+  revokedByUser   User?                    @relation("PlatformRoleRevoker", fields: [revokedByUserId], references: [id], onDelete: Restrict)
+  revokedAt       DateTime?
+  revokeReason    String?
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+
+  @@index([userId, revokedAt])
+  @@index([role, revokedAt])
+  @@index([userId, role])
+  @@map("platform_role_assignment")
+}

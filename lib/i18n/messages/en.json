@@ -47,9 +47,15 @@
     "account": "My account",
     "trackOrder": "Track your order",
     "login": "Sign in",
-    "register": "Create account"
+    "register": "Create account",
+    "forbidden": "Access denied"
   },
   "Placeholder": {
     "message": "This page is coming soon."
+  },
+  "Authz": {
+    "forbiddenTitle": "You do not have access to this page",
+    "forbiddenMessage": "Your account does not have permission to view this area. If you think this is a mistake, contact an administrator.",
+    "returnHome": "Return home"
   }
 }

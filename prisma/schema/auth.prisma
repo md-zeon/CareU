@@ -42,6 +42,10 @@ model User {
     notifications               Notification[]      @relation("NotificationRecipient")
     auditLogs                   AuditLog[]          @relation("AuditLogActor")
 
+    platformRoleAssignments     PlatformRoleAssignment[] @relation("PlatformRoleHolder")
+    grantedPlatformRoles        PlatformRoleAssignment[] @relation("PlatformRoleGranter")
+    revokedPlatformRoles        PlatformRoleAssignment[] @relation("PlatformRoleRevoker")
+
     @@unique([email])
     @@unique([phoneNumber])
     @@map("user")
