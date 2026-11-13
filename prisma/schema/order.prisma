@@ -1,42 +1,42 @@
 // Orders, shipments, fulfillment, and delivery records
 
 model Order {
-  id                       String                    @id @default(cuid())
-  orderNumber              String                    @unique
-  checkoutIdempotencyKey   String?                   @unique
-  customerUserId           String
-  customerUser             User                      @relation("CustomerOrders", fields: [customerUserId], references: [id], onDelete: Restrict)
-  shippingAddressId        String?
-  shippingAddress          SavedAddress?             @relation("OrderShippingAddress", fields: [shippingAddressId], references: [id], onDelete: SetNull)
-  shippingAddressSnapshot  Json
-  paymentStatus            OrderPaymentStatus        @default(UNPAID)
-  fulfillmentStatus        FulfillmentStatus         @default(PLACED)
-  currency                 String                    @default("BDT")
-  fxRateScaled             BigInt?
-  fxRateScale              Int?
-  fxBaseCurrency           String?
-  fxQuoteCurrency          String?
-  subtotalPoisha           BigInt
-  discountPoisha           BigInt                    @default(0)
-  careuFundedDiscountPoisha   BigInt                 @default(0)
-  sellerFundedDiscountPoisha  BigInt                 @default(0)
-  discountReference        String?
-  deliveryPoisha           BigInt                    @default(0)
-  taxPoisha                BigInt                    @default(0)
-  totalPoisha              BigInt
-  createdAt                DateTime                  @default(now())
-  updatedAt                DateTime                  @updatedAt
-  shipments                Shipment[]
-  items                    OrderItem[]
-  statusHistory            OrderStatusHistory[]
-  paymentStatusHistory     OrderPaymentStatusHistory[]
-  payments                 Payment[]
-  refunds                  Refund[]
-  financialLedgerEntries   FinancialLedgerEntry[]
-  codReconciliationRecords CODReconciliationRecord[]
-  supportCases             SupportCase[]
-  disputes                 Dispute[]
-  stockReservations        StockReservation[]
+  id                         String                      @id @default(cuid())
+  orderNumber                String                      @unique
+  checkoutIdempotencyKey     String?                     @unique
+  customerUserId             String
+  customerUser               User                        @relation("CustomerOrders", fields: [customerUserId], references: [id], onDelete: Restrict)
+  shippingAddressId          String?
+  shippingAddress            SavedAddress?               @relation("OrderShippingAddress", fields: [shippingAddressId], references: [id], onDelete: SetNull)
+  shippingAddressSnapshot    Json
+  paymentStatus              OrderPaymentStatus          @default(UNPAID)
+  fulfillmentStatus          FulfillmentStatus           @default(PLACED)
+  currency                   String                      @default("BDT")
+  fxRateScaled               BigInt?
+  fxRateScale                Int?
+  fxBaseCurrency             String?
+  fxQuoteCurrency            String?
+  subtotalPoisha             BigInt
+  discountPoisha             BigInt                      @default(0)
+  careuFundedDiscountPoisha  BigInt                      @default(0)
+  sellerFundedDiscountPoisha BigInt                      @default(0)
+  discountReference          String?
+  deliveryPoisha             BigInt                      @default(0)
+  taxPoisha                  BigInt                      @default(0)
+  totalPoisha                BigInt
+  createdAt                  DateTime                    @default(now())
+  updatedAt                  DateTime                    @updatedAt
+  shipments                  Shipment[]
+  items                      OrderItem[]
+  statusHistory              OrderStatusHistory[]
+  paymentStatusHistory       OrderPaymentStatusHistory[]
+  payments                   Payment[]
+  refunds                    Refund[]
+  financialLedgerEntries     FinancialLedgerEntry[]
+  codReconciliationRecords   CODReconciliationRecord[]
+  supportCases               SupportCase[]
+  disputes                   Dispute[]
+  stockReservations          StockReservation[]
 
   @@index([customerUserId])
   @@index([paymentStatus])
@@ -69,6 +69,7 @@ model Shipment {
   disputes                 Dispute[]
   codReconciliationRecords CODReconciliationRecord[]
   financialLedgerEntries   FinancialLedgerEntry[]
+  mediaAssets              MediaAsset[]              @relation("ShipmentMediaAssets")
 
   // One seller specific shipment per shop in an order. Delivery charge and
   // payout eligibility are recorded per shipment, so a duplicate would double count.
@@ -80,40 +81,40 @@ model Shipment {
 }
 
 model OrderItem {
-  id                         String             @id @default(cuid())
+  id                         String                 @id @default(cuid())
   orderId                    String
-  order                      Order              @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  order                      Order                  @relation(fields: [orderId], references: [id], onDelete: Restrict)
   shipmentId                 String
-  shipment                   Shipment           @relation(fields: [shipmentId], references: [id], onDelete: Restrict)
+  shipment                   Shipment               @relation(fields: [shipmentId], references: [id], onDelete: Restrict)
   shopId                     String
-  shop                       Shop               @relation(fields: [shopId], references: [id], onDelete: Restrict)
+  shop                       Shop                   @relation(fields: [shopId], references: [id], onDelete: Restrict)
   listingId                  String
-  listing                    Listing            @relation(fields: [listingId], references: [id], onDelete: Restrict)
+  listing                    Listing                @relation(fields: [listingId], references: [id], onDelete: Restrict)
   listingVariantId           String
-  listingVariant             ListingVariant     @relation(fields: [listingVariantId], references: [id], onDelete: Restrict)
+  listingVariant             ListingVariant         @relation(fields: [listingVariantId], references: [id], onDelete: Restrict)
   titleSnapshot              String
   skuSnapshot                String
   variantSnapshot            Json?
   unitPricePoisha            BigInt
   quantity                   Int
-  discountPoisha             BigInt             @default(0)
-  careuFundedDiscountPoisha  BigInt             @default(0)
-  sellerFundedDiscountPoisha BigInt             @default(0)
+  discountPoisha             BigInt                 @default(0)
+  careuFundedDiscountPoisha  BigInt                 @default(0)
+  sellerFundedDiscountPoisha BigInt                 @default(0)
   discountReference          String?
-  taxPoisha                  BigInt             @default(0)
+  taxPoisha                  BigInt                 @default(0)
   commissionRuleId           String?
-  commissionRule             CommissionRule?    @relation(fields: [commissionRuleId], references: [id], onDelete: SetNull)
+  commissionRule             CommissionRule?        @relation(fields: [commissionRuleId], references: [id], onDelete: SetNull)
   commissionRateBps          Int?
   commissionBasePoisha       BigInt
   commissionPoisha           BigInt
   lineTotalPoisha            BigInt
-  currency                   String             @default("BDT")
+  currency                   String                 @default("BDT")
   // Item level only. The PARTIALLY_* states describe an order or a shipment,
   // never a single line, and a migration check rejects them here.
-  fulfillmentStatus          FulfillmentStatus  @default(PLACED)
+  fulfillmentStatus          FulfillmentStatus      @default(PLACED)
   metadata                   Json?
-  createdAt                  DateTime           @default(now())
-  updatedAt                  DateTime           @updatedAt
+  createdAt                  DateTime               @default(now())
+  updatedAt                  DateTime               @updatedAt
   reviews                    Review[]
   supportCases               SupportCase[]
   disputes                   Dispute[]

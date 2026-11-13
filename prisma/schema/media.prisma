@@ -1,0 +1,66 @@
+// Shared file storage foundation (spec 0003)
+
+model MediaAsset {
+  id                  String                 @id @default(cuid())
+  storageKey          String                 @unique
+  visibility          MediaVisibility
+  purpose             MediaPurpose
+  fileNameOriginal    String
+  mimeType            String
+  byteSize            Int
+  checksumSha256      String?
+  width               Int?
+  height              Int?
+  altText             String?
+  sortOrder           Int?
+  status              MediaAssetStatus       @default(PENDING_UPLOAD)
+  uploadedByUserId    String
+  uploadedByUser      User                   @relation("MediaAssetUploader", fields: [uploadedByUserId], references: [id], onDelete: Restrict)
+  listingId           String?
+  listing             Listing?               @relation("ListingMediaAssets", fields: [listingId], references: [id], onDelete: Cascade)
+  listingVariantId    String?
+  listingVariant      ListingVariant?        @relation("ListingVariantMediaAssets", fields: [listingVariantId], references: [id], onDelete: SetNull)
+  categoryId          String?
+  category            Category?              @relation("CategoryMediaAssets", fields: [categoryId], references: [id], onDelete: SetNull)
+  sellerApplicationId String?
+  sellerApplication   SellerApplication?     @relation("SellerApplicationMediaAssets", fields: [sellerApplicationId], references: [id], onDelete: Restrict)
+  shipmentId          String?
+  shipment            Shipment?              @relation("ShipmentMediaAssets", fields: [shipmentId], references: [id], onDelete: Restrict)
+  createdAt           DateTime               @default(now())
+  updatedAt           DateTime               @updatedAt
+  accessLogs          PrivateFileAccessLog[]
+
+  @@index([purpose, status])
+  @@index([uploadedByUserId])
+  @@index([listingId])
+  @@index([listingVariantId])
+  @@index([categoryId])
+  @@index([sellerApplicationId])
+  @@index([shipmentId])
+  @@map("media_asset")
+}
+
+model PrivateFileAccessLog {
+  id                 String                     @id @default(cuid())
+  mediaAssetId       String
+  mediaAsset         MediaAsset                 @relation(fields: [mediaAssetId], references: [id], onDelete: Restrict)
+  actorType          PrivateFileAccessActorType
+  accessedByUserId   String?
+  accessedByUser     User?                      @relation("PrivateFileAccessActor", fields: [accessedByUserId], references: [id], onDelete: SetNull)
+  actorRoleOrContext String?
+  purpose            String
+  parentType         String?
+  parentId           String?
+  grantedAt          DateTime                   @default(now())
+  expiresAt          DateTime?
+  ipAddress          String?
+  userAgent          String?
+  result             PrivateFileAccessResult
+  reason             String?
+  createdAt          DateTime                   @default(now())
+
+  @@index([mediaAssetId, createdAt])
+  @@index([accessedByUserId])
+  @@index([result])
+  @@map("private_file_access_log")
+}

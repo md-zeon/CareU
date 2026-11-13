@@ -102,32 +102,32 @@ model CommissionRule {
 }
 
 model FinancialLedgerEntry {
-  id                String                  @id @default(cuid())
-  idempotencyKey    String?                 @unique
+  id                String                   @id @default(cuid())
+  idempotencyKey    String?                  @unique
   shopId            String?
-  shop              Shop?                   @relation(fields: [shopId], references: [id], onDelete: Restrict)
+  shop              Shop?                    @relation(fields: [shopId], references: [id], onDelete: Restrict)
   orderId           String?
-  order             Order?                  @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  order             Order?                   @relation(fields: [orderId], references: [id], onDelete: Restrict)
   shipmentId        String?
-  shipment          Shipment?               @relation(fields: [shipmentId], references: [id], onDelete: Restrict)
+  shipment          Shipment?                @relation(fields: [shipmentId], references: [id], onDelete: Restrict)
   orderItemId       String?
-  orderItem         OrderItem?              @relation(fields: [orderItemId], references: [id], onDelete: Restrict)
+  orderItem         OrderItem?               @relation(fields: [orderItemId], references: [id], onDelete: Restrict)
   paymentId         String?
-  payment           Payment?                @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+  payment           Payment?                 @relation(fields: [paymentId], references: [id], onDelete: Restrict)
   refundId          String?
-  refund            Refund?                 @relation(fields: [refundId], references: [id], onDelete: Restrict)
+  refund            Refund?                  @relation(fields: [refundId], references: [id], onDelete: Restrict)
   payoutBatchId     String?
-  payoutBatch       PayoutBatch?            @relation(fields: [payoutBatchId], references: [id], onDelete: Restrict)
+  payoutBatch       PayoutBatch?             @relation(fields: [payoutBatchId], references: [id], onDelete: Restrict)
   entryType         LedgerEntryType
   amountPoisha      BigInt
-  currency          String                  @default("BDT")
+  currency          String                   @default("BDT")
   direction         LedgerDirection
   eligibilityStatus LedgerEligibilityStatus?
   reason            String?
   actorUserId       String?
-  actorUser         User?                   @relation("FinancialLedgerActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  actorUser         User?                    @relation("FinancialLedgerActor", fields: [actorUserId], references: [id], onDelete: SetNull)
   metadata          Json?
-  createdAt         DateTime                @default(now())
+  createdAt         DateTime                 @default(now())
 
   @@index([shopId])
   @@index([orderId])
@@ -189,31 +189,31 @@ model PayoutItem {
 }
 
 model CODReconciliationRecord {
-  id                 String                      @id @default(cuid())
-  orderId            String?
-  order              Order?                      @relation(fields: [orderId], references: [id], onDelete: Restrict)
-  shipmentId         String?
-  shipment           Shipment?                   @relation(fields: [shipmentId], references: [id], onDelete: Restrict)
-  shopId             String?
-  shop               Shop?                       @relation(fields: [shopId], references: [id], onDelete: Restrict)
-  recordType         CODReconciliationRecordType
-  amountPoisha       BigInt
-  currency           String                      @default("BDT")
-  status             CODReconciliationStatus     @default(OPEN)
-  evidenceRef        String?
-  reason             String?
-  actorUserId        String?
-  actorUser          User?                       @relation("CODReconciliationActor", fields: [actorUserId], references: [id], onDelete: SetNull)
-  resolvedAt         DateTime?
-  resolvedByUserId   String?
-  resolvedByUser     User?                       @relation("CODReconciliationResolver", fields: [resolvedByUserId], references: [id], onDelete: SetNull)
+  id               String                      @id @default(cuid())
+  orderId          String?
+  order            Order?                      @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  shipmentId       String?
+  shipment         Shipment?                   @relation(fields: [shipmentId], references: [id], onDelete: Restrict)
+  shopId           String?
+  shop             Shop?                       @relation(fields: [shopId], references: [id], onDelete: Restrict)
+  recordType       CODReconciliationRecordType
+  amountPoisha     BigInt
+  currency         String                      @default("BDT")
+  status           CODReconciliationStatus     @default(OPEN)
+  evidenceRef      String?
+  reason           String?
+  actorUserId      String?
+  actorUser        User?                       @relation("CODReconciliationActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  resolvedAt       DateTime?
+  resolvedByUserId String?
+  resolvedByUser   User?                       @relation("CODReconciliationResolver", fields: [resolvedByUserId], references: [id], onDelete: SetNull)
   // One to one: a resolution record closes exactly one earlier open record.
-  resolvesRecordId   String?                     @unique
-  resolvesRecord     CODReconciliationRecord?    @relation("CODResolutionLink", fields: [resolvesRecordId], references: [id], onDelete: Restrict)
-  resolvedByRecord   CODReconciliationRecord?    @relation("CODResolutionLink")
-  metadata           Json?
-  createdAt          DateTime                    @default(now())
-  updatedAt          DateTime                    @updatedAt
+  resolvesRecordId String?                     @unique
+  resolvesRecord   CODReconciliationRecord?    @relation("CODResolutionLink", fields: [resolvesRecordId], references: [id], onDelete: Restrict)
+  resolvedByRecord CODReconciliationRecord?    @relation("CODResolutionLink")
+  metadata         Json?
+  createdAt        DateTime                    @default(now())
+  updatedAt        DateTime                    @updatedAt
 
   @@index([orderId])
   @@index([shipmentId])

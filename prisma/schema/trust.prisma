@@ -154,15 +154,15 @@ model Notification {
 }
 
 model NotificationStatusHistory {
-  id             String             @id @default(cuid())
+  id             String              @id @default(cuid())
   notificationId String
-  notification   Notification       @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  notification   Notification        @relation(fields: [notificationId], references: [id], onDelete: Cascade)
   fromStatus     NotificationStatus?
   toStatus       NotificationStatus
   actorUserId    String?
-  actorUser      User?              @relation("NotificationStatusActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  actorUser      User?               @relation("NotificationStatusActor", fields: [actorUserId], references: [id], onDelete: SetNull)
   reason         String?
-  createdAt      DateTime           @default(now())
+  createdAt      DateTime            @default(now())
 
   @@index([notificationId, createdAt])
   @@map("notification_status_history")

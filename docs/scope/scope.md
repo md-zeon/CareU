@@ -17,7 +17,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | D | Catalog menu facade (placeholder) | Already in place | existing |
 | 1 | Marketplace domain model | Foundation | done |
 | 2 | Roles, permissions, and access control | Foundation | done |
-| 3 | Media storage and secure file handling | Foundation | planned |
+| 3 | Media storage and secure file handling | Foundation | in-progress |
 | 4 | CareU first party shop and platform bootstrap | Slice 1 | planned |
 | 5 | Seller onboarding and shop management | Slice 1 | planned |
 | 6 | Category and product catalog foundation | Slice 1 | planned |
@@ -94,10 +94,21 @@ spec [0002](../specs/0002-roles-permissions-access-control/index.md) · code in 
 - [x] Review it (fresh model): `/check review roles, permissions, and access control`
 - [x] Document it: `/document roles, permissions, and access control` (PR description prepared)
 
-### 3. Media storage and secure file handling · needs a decision
+### 3. Media storage and secure file handling · in-progress
 Design and integrate Cloudflare R2 (decided) for public product media and for private documents such as seller verification files and proof of delivery, with safe uploads and controlled access.
 **Done when:** the R2 storage design is recorded in a spec, uploads are validated, and private files are served only through controlled access.
-- [ ] Design it (spec): `/architect media storage and secure file handling`
+spec [0003](../specs/0003-media-storage-secure-file-handling/index.md) · code in `lib/media/`, `app/api/media/`, `prisma/schema/media.prisma`, `prisma/migrations/20261113130000_media_storage_secure_file_handling`, `docs/specs/0003-media-storage-secure-file-handling/integration-notes.md`, `tests/media-foundation.test.ts`
+- [x] Design it (spec): `/architect media storage and secure file handling`
+- [ ] Build it: `/develop media storage and secure file handling`
+  - [x] Milestone 1: schema, migration, and storage utilities (R2 config, key/URL/TTL helpers, validation), satisfies **AC-1**, **AC-2**, **AC-3**, **AC-4**, **AC-5**, **AC-6**
+  - [x] Milestone 2: upload intent and finalize thread (presigned direct upload, verification, idempotent activation), satisfies **AC-1**, **AC-2**, **AC-6**
+  - [x] Milestone 3: private access grants and audit logging (including denied and anonymous attempts), satisfies **AC-3**, **AC-4**, **AC-6**
+  - [x] Milestone 4: media listing, metadata, reorder/replace/remove, history and evidence rules, and safe cleanup, satisfies **AC-1**, **AC-3**, **AC-5**, **AC-6**
+  - [ ] Milestone 5: hardening, focused tests, and integration notes (env vars, CORS, permissions), satisfies **AC-2**, **AC-3**, **AC-4**, **AC-5**, **AC-6**
+- [ ] Verify it: `/check verify media storage and secure file handling`
+- [ ] Test it: `/test media storage and secure file handling`
+- [ ] Review it (fresh model): `/check review media storage and secure file handling`
+- [ ] Document it: `/document media storage and secure file handling`
 
 ## Slice 1: Core marketplace loop
 

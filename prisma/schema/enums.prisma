@@ -316,3 +316,33 @@ enum DeliveryAssigneeType {
   COURIER
   OTHER
 }
+
+enum MediaVisibility {
+  PUBLIC
+  PRIVATE
+}
+
+enum MediaPurpose {
+  LISTING_IMAGE
+  CATEGORY_IMAGE
+  SELLER_VERIFICATION_DOCUMENT
+  PROOF_OF_DELIVERY
+}
+
+enum MediaAssetStatus {
+  PENDING_UPLOAD
+  ACTIVE
+  DELETED
+  REPLACED
+}
+
+enum PrivateFileAccessActorType {
+  USER
+  ANONYMOUS
+  SYSTEM
+}
+
+enum PrivateFileAccessResult {
+  GRANTED
+  DENIED
+}

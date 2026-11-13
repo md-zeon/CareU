@@ -1,20 +1,20 @@
 // Inventory, stock movements, and reservations
 
 model StockLocation {
-  id          String            @id @default(cuid())
-  shopId      String?
-  shop        Shop?             @relation(fields: [shopId], references: [id], onDelete: Restrict)
-  name        String
-  type        StockLocationType @default(PLATFORM)
+  id           String             @id @default(cuid())
+  shopId       String?
+  shop         Shop?              @relation(fields: [shopId], references: [id], onDelete: Restrict)
+  name         String
+  type         StockLocationType  @default(PLATFORM)
   // At most one default location per scope. Partial unique indexes in the
   // migration enforce one default per shop and one platform default.
-  isDefault   Boolean           @default(false)
-  address     Json?
-  metadata    Json?
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
-  balances    InventoryBalance[]
-  movements   StockMovement[]
+  isDefault    Boolean            @default(false)
+  address      Json?
+  metadata     Json?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  balances     InventoryBalance[]
+  movements    StockMovement[]
   reservations StockReservation[]
 
   @@index([shopId])
@@ -39,22 +39,22 @@ model InventoryBalance {
 }
 
 model StockMovement {
-  id               String             @id @default(cuid())
+  id               String              @id @default(cuid())
   listingVariantId String
-  listingVariant   ListingVariant     @relation(fields: [listingVariantId], references: [id], onDelete: Restrict)
+  listingVariant   ListingVariant      @relation(fields: [listingVariantId], references: [id], onDelete: Restrict)
   stockLocationId  String
-  stockLocation    StockLocation      @relation(fields: [stockLocationId], references: [id], onDelete: Restrict)
+  stockLocation    StockLocation       @relation(fields: [stockLocationId], references: [id], onDelete: Restrict)
   reason           StockMovementReason
   quantityDelta    Int
   // Postings that must never apply twice (sale, return, receipt, adjustment)
   // supply a stable key. InventoryBalance stays the authoritative on hand value.
-  idempotencyKey   String?            @unique
+  idempotencyKey   String?             @unique
   referenceType    String?
   referenceId      String?
   actorUserId      String?
-  actorUser        User?              @relation("StockMovementActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  actorUser        User?               @relation("StockMovementActor", fields: [actorUserId], references: [id], onDelete: SetNull)
   note             String?
-  createdAt        DateTime           @default(now())
+  createdAt        DateTime            @default(now())
 
   @@index([listingVariantId])
   @@index([stockLocationId])
