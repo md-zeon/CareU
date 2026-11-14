@@ -20,7 +20,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 1 | Marketplace domain model | Existing foundations (backend later) | done |
 | 2 | Roles, permissions, and access control | Existing foundations (backend later) | done |
 | 3 | Media storage and secure file handling | Existing foundations (backend later) | in-progress |
-| 4 | UI prototype foundation and mock data | UI foundations | planned |
+| 4 | UI prototype foundation and mock data | UI foundations | done |
 | 5 | Prototype access and journey switcher | UI foundations | planned |
 | 6 | Customer home and discovery journey | Phase 1 · Customer journeys | planned |
 | 7 | Customer browse, search, and brand journey | Phase 1 · Customer journeys | planned |
@@ -122,10 +122,17 @@ spec [0003](../specs/0003-media-storage-secure-file-handling/index.md) · code i
 
 Keep foundations only where needed to render and navigate the UI. Build order for the UI prototype (confirmed): 4, then 5, then Phase 1 customer journeys (6 to 12).
 
-### 4. UI prototype foundation and mock data · needs a decision
+### 4. UI prototype foundation and mock data · done
 Set up the shared UI building blocks for the Facade prototype: design direction, layout primitives, reusable page states, and a simple mock data layer so screens can render convincingly without real database reads or writes. Decision (confirmed): adapted Aniq patterns for CareU identity (Bangladesh first, EN/BN, BDT, multi vendor plus CareU first party); representative static fixtures per journey covering happy path and key empty, loading, error, and success states.
 **Done when:** the design direction and mock data approach are recorded, and shared components can render navigation, lists, details, forms, empty, loading, error, and success states across the prototype.
-- [ ] Design it (spec): `/architect ui prototype foundation and mock data`
+spec [0004](../specs/0004-ui-prototype-foundation-and-mock-data/index.md) · code in `lib/mock/`, `components/storefront/primitives/`, `components/storefront/states/`, `components/prototype/`, `app/[locale]/(storefront)/prototype/page.tsx`, `lib/catalog/menu.ts`
+- [x] Design it (spec): `/architect ui prototype foundation and mock data`
+- [x] Build it: `/develop ui prototype foundation and mock data`
+  - [x] Milestone 1: create `lib/mock/` types, domain modules, and representative fixtures with scenario helpers for all phase groups, satisfies **AC-1**, **AC-2**
+  - [x] Milestone 2: add reusable layout primitives and practical design tokens adapted to CareU, satisfies **AC-3**, **AC-5**
+  - [x] Milestone 3: add loading, empty, error, success, and form feedback primitives, satisfies **AC-4**, **AC-5**
+  - [x] Milestone 4: refactor shared shell and `lib/catalog/menu.ts` onto the foundation while keeping routes navigable, satisfies **AC-5**, **AC-6**
+  - [x] Milestone 5: add the internal showcase, local placeholder assets, and consistency pass (bilingual, integer BDT, no real backend/auth), satisfies **AC-2**, **AC-4**, **AC-5**, **AC-6**, **AC-7**
 
 ### 5. Prototype access and journey switcher · needs a decision
 Add easy UI only access for the prototype so you can move through customer, seller, and platform admin journeys without real auth enforcement, while still showing sign in and sign in required screens where CareU policy requires them. Decision (confirmed): a persistent prototype UI switcher to jump between mock personas and views (guest, signed in customer, seller owner or staff, platform roles) and reach sign in required screens as UI flows.

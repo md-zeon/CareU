@@ -1,4 +1,6 @@
 import { getTranslations } from "next-intl/server";
+import { PageContainer, PageHeader } from "@/components/storefront/primitives";
+import { EmptyState } from "@/components/storefront/states";
 
 /** Placeholder for the wishlist page. */
 export default async function WishlistPage() {
@@ -6,9 +8,9 @@ export default async function WishlistPage() {
   const placeholder = await getTranslations("Placeholder");
 
   return (
-    <div className="mx-auto max-w-360 px-4 py-16 sm:px-6 lg:px-8">
-      <h1 className="text-2xl font-semibold tracking-tight">{t("wishlist")}</h1>
-      <p className="mt-2 text-muted-foreground">{placeholder("message")}</p>
-    </div>
+    <PageContainer className="space-y-6 py-10 sm:py-14">
+      <PageHeader title={t("wishlist")} description={placeholder("message")} />
+      <EmptyState title={t("wishlist")} message={placeholder("message")} />
+    </PageContainer>
   );
 }
