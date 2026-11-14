@@ -9,7 +9,10 @@
   "Announcement": {
     "items": [
       "Free delivery on orders over ৳999",
-      { "text": "Track your order anytime", "href": "/order/track" },
+      {
+        "text": "Track your order anytime",
+        "href": "/order/track"
+      },
       "Cash on delivery available nationwide",
       {
         "text": "New arrivals in Electronics",
@@ -96,5 +99,33 @@
     "forbiddenTitle": "You do not have access to this page",
     "forbiddenMessage": "Your account does not have permission to view this area. If you think this is a mistake, contact an administrator.",
     "returnHome": "Return home"
+  },
+  "PrototypeAccess": {
+    "badge": "Prototype",
+    "title": "Prototype access",
+    "description": "Switch mock personas and jump between prototype journeys. This controls UI only and does not grant real access.",
+    "open": "Open prototype switcher",
+    "close": "Close prototype switcher",
+    "panelOpen": "Open",
+    "panelClosed": "Closed",
+    "currentPersona": "Current view",
+    "personas": "Mock personas",
+    "shortcuts": "Journey shortcuts",
+    "areaGeneral": "General",
+    "areaCustomer": "Customer",
+    "areaSeller": "Seller",
+    "areaPlatform": "Platform",
+    "planned": "Not built yet",
+    "available": "Available",
+    "requiresSignIn": "Sign in required",
+    "signInRequiredTitle": "Sign in required for this view",
+    "signInRequiredMessage": "CareU requires you to sign in for this area. In this prototype, choose a signed in mock persona to continue without real authentication.",
+    "continueAs": "Continue as",
+    "goToLogin": "Open sign in screen",
+    "stayGuest": "Stay as guest",
+    "guestNoAccess": "Guest view cannot open this protected prototype flow.",
+    "notBuiltTitle": "This journey is not built yet",
+    "notBuiltMessage": "The route exists as a placeholder so you can keep moving through the prototype map.",
+    "suggestedPersona": "Suggested view"
   }
 }

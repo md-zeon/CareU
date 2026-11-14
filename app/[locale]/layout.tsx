@@ -2,12 +2,15 @@
 import "@/app/globals.css";
 import { locale as getRootLocale } from "next/root-params";
 import { Hind_Siliguri, Inter } from "next/font/google";
-import { hasLocale } from "next-intl";
+import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
+import type { AbstractIntlMessages } from "next-intl";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { routing } from "@/lib/i18n/routing";
+import { PrototypeSessionProvider } from "@/lib/prototype/session";
+import { PrototypeChrome } from "@/components/prototype/PrototypeChrome";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -49,12 +52,26 @@ export default async function LocaleLayout({ children }: LocaleLayoutProps) {
     notFound();
   }
 
+  const messages = (await import(`@/lib/i18n/messages/${locale}.json`)).default as AbstractIntlMessages & {
+    PrototypeAccess?: AbstractIntlMessages;
+  };
+  const prototypeMessages = {
+    PrototypeAccess: messages.PrototypeAccess ?? {},
+  };
+
   return (
     <html
       lang={locale}
       className={`${inter.variable} ${hindSiliguri.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        <NextIntlClientProvider locale={locale} messages={prototypeMessages}>
+          <PrototypeSessionProvider>
+            {children}
+            <PrototypeChrome />
+          </PrototypeSessionProvider>
+        </NextIntlClientProvider>
+      </body>
     </html>
   );
 }

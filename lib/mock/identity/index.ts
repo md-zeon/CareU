@@ -9,8 +9,10 @@ export const mockPersonas: MockPersona[] = [
   { id: "persona-customer", kind: "customer", displayName: l("Nadia Rahman", "নাদিয়া রহমান"), contactLabel: "+8801700000000", scopeLabel: l("Signed in customer", "সাইন ইন করা ক্রেতা") },
   { id: "persona-seller-owner", kind: "seller_owner", displayName: l("Urban Thread Owner", "আরবান থ্রেড মালিক"), shopId: "shop-urban", contactLabel: "owner@urban-thread.example", scopeLabel: l("Seller owner, Urban Thread", "বিক্রেতা মালিক, আরবান থ্রেড") },
   { id: "persona-seller-staff", kind: "seller_staff", displayName: l("Shop Staff", "দোকানের স্টাফ"), shopId: "shop-urban", contactLabel: "staff@urban-thread.example", scopeLabel: l("Seller staff, Urban Thread", "বিক্রেতা স্টাফ, আরবান থ্রেড") },
+  { id: "persona-careu-shop-staff", kind: "seller_staff", displayName: l("CareU Shop Staff", "কেয়ারইউ দোকান স্টাফ"), shopId: "shop-careu", contactLabel: "careu.staff@example.com", scopeLabel: l("CareU first party shop staff", "কেয়ারইউ প্রথম পক্ষের দোকান স্টাফ") },
   { id: "persona-platform-admin", kind: "platform", displayName: l("Platform Admin", "প্ল্যাটফর্ম অ্যাডমিন"), platformRole: "platform_admin", scopeLabel: l("Platform administration", "প্ল্যাটফর্ম প্রশাসন") },
-  { id: "persona-platform-support", kind: "platform", displayName: l("Support Agent", "সাপোর্ট এজেন্ট"), platformRole: "customer_support", scopeLabel: l("Customer support operations", "কাস্টমার সাপোর্ট অপারেশন") },
+  { id: "persona-platform-support", kind: "platform", displayName: l("Support Agent", "সাপোর্ট এজেন্ট"), platformRole: "customer_support", scopeLabel: l("Operations and support view", "অপারেশন ও সাপোর্ট ভিউ") },
+  { id: "persona-platform-finance", kind: "platform", displayName: l("Finance and Settlements", "ফাইন্যান্স ও সেটেলমেন্ট"), platformRole: "finance_settlements", scopeLabel: l("Finance and settlements view", "ফাইন্যান্স ও সেটেলমেন্ট ভিউ") },
 ];
 
 export function getMockPersonas(options?: ScenarioOptions): ScenarioResult<MockPersona[]> {

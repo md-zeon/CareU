@@ -21,7 +21,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 2 | Roles, permissions, and access control | Existing foundations (backend later) | done |
 | 3 | Media storage and secure file handling | Existing foundations (backend later) | in-progress |
 | 4 | UI prototype foundation and mock data | UI foundations | done |
-| 5 | Prototype access and journey switcher | UI foundations | planned |
+| 5 | Prototype access and journey switcher | UI foundations | done |
 | 6 | Customer home and discovery journey | Phase 1 · Customer journeys | planned |
 | 7 | Customer browse, search, and brand journey | Phase 1 · Customer journeys | planned |
 | 8 | Customer product and review journey | Phase 1 · Customer journeys | planned |
@@ -134,10 +134,16 @@ spec [0004](../specs/0004-ui-prototype-foundation-and-mock-data/index.md) · cod
   - [x] Milestone 4: refactor shared shell and `lib/catalog/menu.ts` onto the foundation while keeping routes navigable, satisfies **AC-5**, **AC-6**
   - [x] Milestone 5: add the internal showcase, local placeholder assets, and consistency pass (bilingual, integer BDT, no real backend/auth), satisfies **AC-2**, **AC-4**, **AC-5**, **AC-6**, **AC-7**
 
-### 5. Prototype access and journey switcher · needs a decision
+### 5. Prototype access and journey switcher · done
 Add easy UI only access for the prototype so you can move through customer, seller, and platform admin journeys without real auth enforcement, while still showing sign in and sign in required screens where CareU policy requires them. Decision (confirmed): a persistent prototype UI switcher to jump between mock personas and views (guest, signed in customer, seller owner or staff, platform roles) and reach sign in required screens as UI flows.
 **Done when:** a prototype user can enter customer, seller, and admin areas, see mock signed in states and role views, and reach policy correct sign in required screens without real backend checks.
-- [ ] Design it (spec): `/architect prototype access and journey switcher`
+spec [0005](../specs/0005-prototype-access-and-journey-switcher/index.md) · code in `lib/prototype/`, `components/prototype/PrototypeAccessSwitcher.tsx`, `components/prototype/PrototypeGate.tsx`, `app/[locale]/layout.tsx`
+- [x] Design it (spec): `/architect prototype access and journey switcher`
+- [x] Build it: `/develop prototype access and journey switcher`
+  - [x] Milestone 1: define typed persona/shortcut/session config and implement shared browser persisted session state with safe guest fallback, satisfies **AC-2**, **AC-3**, **AC-4**, **AC-6**, **AC-7**
+  - [x] Milestone 2: build the clearly labeled floating switcher UI with persona picker and grouped journey shortcuts, satisfies **AC-1**, **AC-2**, **AC-3**, **AC-7**
+  - [x] Milestone 3: mount the provider and switcher in the root locale layout and add the shared sign in required gate and placeholder handling, satisfies **AC-1**, **AC-3**, **AC-5**, **AC-6**, **AC-7**
+  - [x] Milestone 4: extend mock persona foundations, apply gates to representative protected prototype flows, and complete consistency and boundary checks, satisfies **AC-1**, **AC-2**, **AC-4**, **AC-5**, **AC-6**, **AC-7**
 
 ## Phase 1: Customer journeys (UI prototype)
 
