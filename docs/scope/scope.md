@@ -2,10 +2,12 @@
 
 CareU.bd is a Bangladesh first multi vendor marketplace where third party sellers and CareU's own shop sell through one shared buying experience. Over time it will also support multiple branch locations for stock and fulfillment and broader company operations.
 
-**Build approach:** Tracer Bullet (prove one thin, real end to end thread through every layer, then thicken it slice by slice).
-**Workflow:** GA (after /develop: /check verify, /test, a fresh model /check review, then /document). The project default level of rigor. `/architect` is the recommended first stop for a feature with a real decision, but skippable when you already know the build. Any feature can carry its own tag (e.g. `· Beta`) to do more or less.
+**Build approach:** Facade (make the whole product look and feel real first on placeholder and mock data, then wire the real system behind it after you approve the UI). This is prototype grade on purpose: Phase 1 is a clickable, believable UI, not production complete.
+**Workflow:** Prototype (after /develop: nothing extra required; rely on develop's own build time self check). The project default level of rigor while we prove the experience first. `/architect` is still the recommended first stop for a feature with a real decision, but skippable when you already know the build. Any feature can carry its own tag (e.g. `· Alpha`) to do more.
 
 _These are recommendations to keep your build orderly, not requirements. Skip anything that does not fit: if you already know how to build a feature, use `/develop` and skip `/architect`. You decide when a feature is `done`._
+
+**UI direction (inspiration):** draw UI and UX ideas from [Aniq UI fashion storefront demo](https://ecommerce-clothes-1.aniq-ui.com/en), [Aniq UI ecommerce admin dashboard demo](https://ecommerce-clothes-1-admin.aniq-ui.com/en/dashboard), [Flannels](https://www.flannels.com/), and [Masari Shop](https://www.masarishop.com/). Use them for layout, page flow, navigation patterns, states, and merchandising feel; adapt for CareU's Bangladesh first, multi vendor marketplace and confirmed rules.
 
 ## At a glance
 
@@ -15,30 +17,34 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | B | Authentication basics | Already in place | in-progress |
 | C | Money primitives and test baseline | Already in place | existing |
 | D | Catalog menu facade (placeholder) | Already in place | existing |
-| 1 | Marketplace domain model | Foundation | done |
-| 2 | Roles, permissions, and access control | Foundation | done |
-| 3 | Media storage and secure file handling | Foundation | in-progress |
-| 4 | CareU first party shop and platform bootstrap | Slice 1 | planned |
-| 5 | Seller onboarding and shop management | Slice 1 | planned |
-| 6 | Category and product catalog foundation | Slice 1 | planned |
-| 7 | Product and listing management | Slice 1 | planned |
-| 8 | Storefront browse and product pages | Slice 1 | planned |
-| 9 | Customer account, addresses, and cart | Slice 1 | planned |
-| 10 | Checkout, stock reservation, and order placement | Slice 1 | planned |
-| 11 | Payments and cash on delivery handling | Slice 1 | planned |
-| 12 | Fulfillment, shipments, and order tracking | Slice 1 | planned |
-| 13 | Inventory ledger and stock operations | Slice 2 | planned |
-| 14 | Delivery configuration and assignment | Slice 2 | planned |
-| 15 | Returns, refunds, and disputes | Slice 2 | planned |
-| 16 | Customer support cases | Slice 2 | planned |
-| 17 | Notifications and message history | Slice 2 | planned |
-| 18 | Commissions, seller balances, and settlements | Slice 2 | planned |
-| 19 | Promotions, coupons, and campaigns | Slice 3 | planned |
-| 20 | Reviews and ratings | Slice 3 | planned |
-| 21 | Analytics and reporting | Slice 3 | planned |
-| 22 | Public site SEO and legal basics | Slice 3 | planned |
-| 27 | Site content management (CMS) for company roles | Slice 3 | planned |
-| 28 | Super admin theme customization | Slice 3 | planned |
+| 1 | Marketplace domain model | Existing foundations (backend later) | done |
+| 2 | Roles, permissions, and access control | Existing foundations (backend later) | done |
+| 3 | Media storage and secure file handling | Existing foundations (backend later) | in-progress |
+| 4 | UI prototype foundation and mock data | UI foundations | planned |
+| 5 | Prototype access and journey switcher | UI foundations | planned |
+| 6 | Customer home and discovery journey | Phase 1 · Customer journeys | planned |
+| 7 | Customer browse, search, and brand journey | Phase 1 · Customer journeys | planned |
+| 8 | Customer product and review journey | Phase 1 · Customer journeys | planned |
+| 9 | Customer cart and wishlist journey | Phase 1 · Customer journeys | planned |
+| 10 | Customer checkout and order confirmation journey | Phase 1 · Customer journeys | planned |
+| 11 | Customer account, addresses, orders, and tracking journey | Phase 1 · Customer journeys | planned |
+| 12 | Customer support and trust pages journey | Phase 1 · Customer journeys | planned |
+| 13 | Seller entry, onboarding, and shop setup journey | Phase 2 · Seller journeys | planned |
+| 14 | Seller dashboard and shop management journey | Phase 2 · Seller journeys | planned |
+| 15 | Seller catalog, listings, and inventory journey | Phase 2 · Seller journeys | planned |
+| 16 | Seller orders, fulfillment, and delivery journey | Phase 2 · Seller journeys | planned |
+| 17 | Seller earnings, payouts, and support journey | Phase 2 · Seller journeys | planned |
+| 18 | Platform admin shell and overview journey | Phase 3 · Admin journeys | planned |
+| 19 | Platform seller, shop, and listing moderation journey | Phase 3 · Admin journeys | planned |
+| 20 | Platform catalog, pricing, and inventory operations journey | Phase 3 · Admin journeys | planned |
+| 21 | Platform orders, payments, COD, and delivery operations journey | Phase 3 · Admin journeys | planned |
+| 22 | Platform returns, refunds, disputes, support, and settlements journey | Phase 3 · Admin journeys | planned |
+| 23 | Platform content, theme, notifications, and analytics journey | Phase 3 · Admin journeys | planned |
+| 24 | UI approval checkpoint and backend wiring plan | After UI approval | planned |
+| 25 | Wire foundations, auth, roles, and media to the UI | Later · Backend wiring | planned |
+| 26 | Wire customer commerce and fulfillment flows | Later · Backend wiring | planned |
+| 27 | Wire seller operations and marketplace money flows | Later · Backend wiring | planned |
+| 28 | Wire platform operations, governance, and reporting | Later · Backend wiring | planned |
 | 29 | Multi branch locations for stock and fulfillment | Future | planned |
 | 30 | Branch and company operations management | Future | planned |
 | 31 | Employee affiliate marketing | Future | planned |
@@ -50,7 +56,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 Next.js app shell with locale routing for English and Bangla, shared layout, fonts, theme, header, footer, and placeholder storefront routes. code in `app/[locale]/`, `components/storefront/`, `lib/i18n/`
 
 ### B. Authentication basics · in-progress
-Better Auth with phone and email one time codes, session helpers, and the base auth database models. Role and permission enforcement for the full marketplace is still to come. code in `lib/auth.ts`, `lib/session.ts`, `lib/auth-client.ts`, `prisma/schema/auth.prisma`, `app/api/auth/`
+Better Auth with phone and email one time codes, session helpers, and the base auth database models. Role and permission enforcement for the full marketplace is still to come. Real auth enforcement is deferred during the UI prototype phase and will be wired later. code in `lib/auth.ts`, `lib/session.ts`, `lib/auth-client.ts`, `prisma/schema/auth.prisma`, `app/api/auth/`
 
 ### C. Money primitives and test baseline · existing
 Integer poisha helpers, rounding, allocation, and discount pipeline with T1 money tests in place. code in `lib/money/`, `tests/money/`
@@ -58,11 +64,13 @@ Integer poisha helpers, rounding, allocation, and discount pipeline with T1 mone
 ### D. Catalog menu facade (placeholder) · existing
 Static seeded category and menu data served behind a cache facade for the storefront header. code in `lib/catalog/menu.ts`, `lib/catalog/menu.types.ts`
 
-## Foundations
+## Existing foundations (kept, backend wiring deferred until after UI approval)
+
+These records and specs stay in place. During the UI first Facade phase, do not extend their backend behavior unless it is required to render or navigate the prototype. Use placeholder and mock data in the UI instead.
 
 ### 1. Marketplace domain model · done
-Define the core records for sellers, shops, CareU as first party, categories, products and variants, inventory, carts, orders, payments, shipments, and audit history so every slice shares one consistent model.
-**Done when:** the marketplace entities, relationships, and key constraints are recorded in a spec and the schema can support later slices without breaking rewrites.
+Core records for sellers, shops, CareU as first party, categories, products and variants, inventory, carts, orders, payments, shipments, and audit history, recorded so later backend wiring has one consistent model.
+**Done when:** the marketplace entities, relationships, and key constraints remain recorded in a spec and the schema can support later slices without breaking rewrites.
 spec [0001](../specs/0001-marketplace-domain-model/index.md)
 code in `prisma/schema/enums.prisma`, `prisma/schema/seller.prisma`, `prisma/schema/catalog.prisma`, `prisma/schema/inventory.prisma`, `prisma/schema/customer.prisma`, `prisma/schema/order.prisma`, `prisma/schema/payment.prisma`, `prisma/schema/trust.prisma`, `prisma/schema/auth.prisma`, `prisma/migrations/20261112074041_marketplace_domain_model`
 - [x] Design it (spec): `/architect marketplace domain model`
@@ -79,8 +87,8 @@ code in `prisma/schema/enums.prisma`, `prisma/schema/seller.prisma`, `prisma/sch
 - [x] Document it: `/document marketplace domain model`
 
 ### 2. Roles, permissions, and access control · done
-Define and enforce roles for customers, seller owners and staff, and platform staff, with shop scoped and platform scoped permissions checked on the server for every protected action.
-**Done when:** the permission model is recorded in a spec and protected actions can be granted or denied by trusted server side roles and scopes.
+Roles for customers, seller owners and staff, and platform staff, with shop scoped and platform scoped permissions designed and recorded. Real server side enforcement across marketplace flows is deferred until backend wiring after UI approval.
+**Done when:** the permission model remains recorded in a spec and protected actions can be granted or denied by trusted server side roles and scopes when backend wiring resumes.
 spec [0002](../specs/0002-roles-permissions-access-control/index.md) · code in `lib/authz/`, `app/api/authz/roles/route.ts`, `app/[locale]/(storefront)/forbidden/page.tsx`, `scripts/bootstrap-super-admin.ts`, `prisma/schema/rbac.prisma`, `prisma/migrations/20261112103000_roles_permissions_access_control`, `tests/acceptance-gates.test.ts`, `tests/authz-catalog.test.ts`, `tests/authz-milestone5.test.ts`, `tests/authz-access-control.test.ts`
 - [x] Design it (spec): `/architect roles, permissions, and access control`
 - [x] Build it: `/develop roles, permissions, and access control`
@@ -95,11 +103,11 @@ spec [0002](../specs/0002-roles-permissions-access-control/index.md) · code in 
 - [x] Document it: `/document roles, permissions, and access control` (PR description prepared)
 
 ### 3. Media storage and secure file handling · in-progress
-Design and integrate Cloudflare R2 (decided) for public product media and for private documents such as seller verification files and proof of delivery, with safe uploads and controlled access.
-**Done when:** the R2 storage design is recorded in a spec, uploads are validated, and private files are served only through controlled access.
+Cloudflare R2 design and backend foundation for public product media and private documents. Backend work is paused during the UI first phase; use placeholder images and files in the prototype and resume milestone 5 and integration after UI approval.
+**Done when:** the R2 storage design remains recorded in a spec, and when resumed uploads are validated and private files are served only through controlled access.
 spec [0003](../specs/0003-media-storage-secure-file-handling/index.md) · code in `lib/media/`, `app/api/media/`, `prisma/schema/media.prisma`, `prisma/migrations/20261113130000_media_storage_secure_file_handling`, `docs/specs/0003-media-storage-secure-file-handling/integration-notes.md`, `tests/media-foundation.test.ts`
 - [x] Design it (spec): `/architect media storage and secure file handling`
-- [ ] Build it: `/develop media storage and secure file handling`
+- [ ] Build it (paused during UI first): `/develop media storage and secure file handling`
   - [x] Milestone 1: schema, migration, and storage utilities (R2 config, key/URL/TTL helpers, validation), satisfies **AC-1**, **AC-2**, **AC-3**, **AC-4**, **AC-5**, **AC-6**
   - [x] Milestone 2: upload intent and finalize thread (presigned direct upload, verification, idempotent activation), satisfies **AC-1**, **AC-2**, **AC-6**
   - [x] Milestone 3: private access grants and audit logging (including denied and anonymous attempts), satisfies **AC-3**, **AC-4**, **AC-6**
@@ -110,116 +118,152 @@ spec [0003](../specs/0003-media-storage-secure-file-handling/index.md) · code i
 - [ ] Review it (fresh model): `/check review media storage and secure file handling`
 - [ ] Document it: `/document media storage and secure file handling`
 
-## Slice 1: Core marketplace loop
+## UI foundations
 
-### 4. CareU first party shop and platform bootstrap · needs a decision
-Set up CareU as the first party shop and seed the minimum platform records so CareU can sell its own products through the same shared flow as sellers.
-**Done when:** CareU exists as a first party shop in the system and the platform can tell CareU sales apart from third party seller sales for later money handling.
-- [ ] Design it (spec): `/architect careu first party shop and platform bootstrap`
+Keep foundations only where needed to render and navigate the UI. Build order for the UI prototype (confirmed): 4, then 5, then Phase 1 customer journeys (6 to 12).
 
-### 5. Seller onboarding and shop management · needs a decision
-Let sellers apply, submit required details, and be approved or rejected by admins, then create and manage one shop per account with basic staff and shop status controls.
-**Done when:** an admin can approve a seller, the seller gets one shop, shop status can be managed, and seller actions stay limited to their own shop.
-- [ ] Design it (spec): `/architect seller onboarding and shop management`
+### 4. UI prototype foundation and mock data · needs a decision
+Set up the shared UI building blocks for the Facade prototype: design direction, layout primitives, reusable page states, and a simple mock data layer so screens can render convincingly without real database reads or writes. Decision (confirmed): adapted Aniq patterns for CareU identity (Bangladesh first, EN/BN, BDT, multi vendor plus CareU first party); representative static fixtures per journey covering happy path and key empty, loading, error, and success states.
+**Done when:** the design direction and mock data approach are recorded, and shared components can render navigation, lists, details, forms, empty, loading, error, and success states across the prototype.
+- [ ] Design it (spec): `/architect ui prototype foundation and mock data`
 
-### 6. Category and product catalog foundation · needs a decision
-Build the shared category tree and product structures for simple and variant products so CareU and approved sellers can list items against a common catalog.
-**Done when:** categories and product structures support both CareU and seller listings, with the attributes needed for real browse and order records.
-- [ ] Design it (spec): `/architect category and product catalog foundation`
+### 5. Prototype access and journey switcher · needs a decision
+Add easy UI only access for the prototype so you can move through customer, seller, and platform admin journeys without real auth enforcement, while still showing sign in and sign in required screens where CareU policy requires them. Decision (confirmed): a persistent prototype UI switcher to jump between mock personas and views (guest, signed in customer, seller owner or staff, platform roles) and reach sign in required screens as UI flows.
+**Done when:** a prototype user can enter customer, seller, and admin areas, see mock signed in states and role views, and reach policy correct sign in required screens without real backend checks.
+- [ ] Design it (spec): `/architect prototype access and journey switcher`
 
-### 7. Product and listing management · needs a decision
-Provide tools for CareU staff and approved sellers to create, edit, and publish listings with prices, variants, and ownership checks, respecting approval and moderation rules.
-**Done when:** authorized users can manage their own listings, sensitive changes follow the right checks, and listings are ready to appear on the storefront.
-- [ ] Design it (spec): `/architect product and listing management`
+## Phase 1: Customer journeys (UI prototype)
 
-### 8. Storefront browse and product pages · needs a decision
-Show real categories and product pages on the public storefront with clear price, availability, and crawlable content so customers can find and understand products.
-**Done when:** customers can browse categories and open a product page with accurate, server rendered information and basic SEO metadata.
-- [ ] Design it (spec): `/architect storefront browse and product pages`
+Build each customer journey as a complete clickable flow on placeholder and mock data, including navigation and empty, loading, error, and success states, before moving to the next journey.
 
-### 9. Customer account, addresses, and cart · needs a decision
-Let signed in customers manage their profile and delivery addresses and keep a cart that is ready for a server checked checkout.
-**Done when:** a signed in customer can save addresses, add items to a cart, and see a cart that reflects current items for checkout.
-- [ ] Design it (spec): `/architect customer account, addresses, and cart`
+### 6. Customer home and discovery journey · needs a decision
+Prototype the storefront home and discovery experience: hero and merchandising sections, category and brand entry points, promotions and editorial style highlights, header and footer navigation, inspired by the reference sites and adapted to CareU.
+**Done when:** a visitor can move through home, featured sections, and entry points into browse flows with believable content and all key page states.
+- [ ] Design it (spec): `/architect customer home and discovery journey`
 
-### 10. Checkout, stock reservation, and order placement · needs a decision
-Run a server checked checkout that confirms prices and stock, reserves inventory safely, and creates immutable order and shipment records for each shop in the cart.
-**Done when:** a checkout either reserves all required stock and creates correct order records, or fails safely without partial reservations or wrong totals.
-- [ ] Design it (spec): `/architect checkout, stock reservation, and order placement`
+### 7. Customer browse, search, and brand journey · needs a decision
+Prototype category, collection, search, and brand browsing with filters, sorting, pagination or load more, breadcrumbs, and clear empty and no result states on mock catalog data.
+**Done when:** a customer can browse categories and brands, refine results, search, and open products through a complete, navigable UI flow with its states.
+- [ ] Design it (spec): `/architect customer browse, search, and brand journey`
 
-### 11. Payments and cash on delivery handling · needs a decision
-Support cash on delivery and the first online payment flow with verified, idempotent updates so orders and money states stay correct even with delays or repeats.
-**Done when:** an order can move through payment states safely for cash on delivery and online payment, and only verified payment results settle an order.
-- [ ] Design it (spec): `/architect payments and cash on delivery handling`
+### 8. Customer product and review journey · needs a decision
+Prototype product detail pages with galleries, variant selection, price and availability display, seller or shop context, related products, and review presentation on mock data, including future facing space for supported experiences.
+**Done when:** a customer can view a product, switch variants, understand availability and shop context, see review and related item states, and continue to cart or wishlist flows.
+- [ ] Design it (spec): `/architect customer product and review journey`
 
-### 12. Fulfillment, shipments, and order tracking · needs a decision
-Create per shop shipment records with status history, basic assignment, tracking details, and proof of delivery so a placed order can be fulfilled and followed to completion.
-**Done when:** staff or sellers can update a shipment through its allowed steps, capture proof of delivery when required, and a signed in customer can track their order.
-- [ ] Design it (spec): `/architect fulfillment, shipments, and order tracking`
+### 9. Customer cart and wishlist journey · needs a decision
+Prototype cart and wishlist screens as complete UI flows with item lists, quantity and selection changes, saved for later style states if useful, and clear empty and error states using browser side or mock data only.
+**Done when:** a signed in mock customer can add, view, update, and remove items in cart and wishlist and move onward to checkout or browsing.
+- [ ] Design it (spec): `/architect customer cart and wishlist journey`
 
-## Slice 2: Operations and trust
+### 10. Customer checkout and order confirmation journey · needs a decision
+Prototype the checkout flow on mock data: address selection, delivery option display, payment method selection screens (cash on delivery and online payment UI), order summary, confirmation, and failure states. Follow CareU policy: no guest checkout and no real stock reservation or payment processing.
+**Done when:** a mock signed in customer can complete or fail a checkout UI flow, see clear confirmation and error states, and understand per shop and total summaries without backend writes.
+- [ ] Design it (spec): `/architect customer checkout and order confirmation journey`
 
-### 13. Inventory ledger and stock operations · needs a decision
-Track stock movements with reasons, support restocks and adjustments, and surface low stock and out of stock states for CareU and seller managed inventory.
-**Done when:** every stock change is recorded with a reason, stock levels stay accurate, and authorized users can manage inventory without overselling.
-- [ ] Design it (spec): `/architect inventory ledger and stock operations`
+### 11. Customer account, addresses, orders, and tracking journey · needs a decision
+Prototype customer account areas: profile, saved addresses, order history and detail, per shipment status views, and order tracking. Follow CareU policy: tracking requires sign in. Use mock order and shipment states.
+**Done when:** a mock signed in customer can manage profile and address screens, review orders, and track shipments through complete UI states.
+- [ ] Design it (spec): `/architect customer account, addresses, orders, and tracking journey`
 
-### 14. Delivery configuration and assignment · needs a decision
-Configure delivery charges and methods for coverage across all districts at launch, assign CareU managed deliveries to staff or couriers, and keep delivery details consistent on each shipment.
-**Done when:** delivery options and charges can be applied and recorded per shipment across all districts, and CareU managed deliveries can be assigned and tracked.
-- [ ] Design it (spec): `/architect delivery configuration and assignment`
+### 12. Customer support and trust pages journey · needs a decision
+Prototype help and trust surfaces: contact and FAQ, order linked support entry points, return and policy information, and legal pages (privacy, terms, consent) as navigable content screens.
+**Done when:** a customer can find help, start a support style flow in UI, and read trust and legal pages with consistent navigation and states.
+- [ ] Design it (spec): `/architect customer support and trust pages journey`
 
-### 15. Returns, refunds, and disputes · needs a decision
-Support return requests, refunds, and disputes with clear status, evidence, review, and recorded outcomes that connect back to orders and money.
-**Done when:** eligible items can move through a reviewed return or dispute flow and any refund or adjustment is recorded with its reason and effect.
-- [ ] Design it (spec): `/architect returns, refunds, and disputes`
+## Phase 2: Seller journeys (UI prototype)
 
-### 16. Customer support cases · needs a decision
-Provide support cases linked to orders or items with categories, priority, assignment, internal notes, attachments, status history, and resolutions.
-**Done when:** support staff and customers can follow a case from open to resolved with a clear history, while internal notes stay hidden from customers.
-- [ ] Design it (spec): `/architect customer support cases`
+Build each seller journey as a complete clickable flow on placeholder and mock data, including navigation and empty, loading, error, and success states, before moving to the next journey.
 
-### 17. Notifications and message history · needs a decision
-Send important updates by email and in app, and keep a history so users can see what was sent and its status.
-**Done when:** key order, account, and support events create the right email and in app messages and users can review their notification history.
-- [ ] Design it (spec): `/architect notifications and message history`
+### 13. Seller entry, onboarding, and shop setup journey · needs a decision
+Prototype seller application, verification document submission views, approval status screens, and initial shop setup for one shop per account, using mock states and no real review actions.
+**Done when:** a seller can move through apply, pending, approved or rejected, and shop setup screens with clear states and next steps.
+- [ ] Design it (spec): `/architect seller entry, onboarding, and shop setup journey`
 
-### 18. Commissions, seller balances, and settlements · needs a decision
-Calculate commissions, track seller balances, and manage manual payout batches and cash on delivery reconciliation with auditable records.
-**Done when:** eligible earnings, commissions, and payout actions are recorded clearly, and CareU first party sales stay separate from third party seller payouts.
-- [ ] Design it (spec): `/architect commissions, seller balances, and settlements`
+### 14. Seller dashboard and shop management journey · needs a decision
+Prototype the seller home dashboard and shop management: shop profile, staff and role views, shop status controls, and key summary cards, all on mock data and scoped to one shop in the UI.
+**Done when:** a mock seller user can navigate their dashboard and manage shop information and status screens with complete UI states.
+- [ ] Design it (spec): `/architect seller dashboard and shop management journey`
 
-## Slice 3: Growth and governance
+### 15. Seller catalog, listings, and inventory journey · needs a decision
+Prototype listing and inventory management screens: create and edit products and variants, pricing, media placeholders, stock views, low stock and out of stock states, and moderation status displays on mock data.
+**Done when:** a mock seller or CareU shop user can move through listing and inventory screens with believable data, validation style feedback, and all key states.
+- [ ] Design it (spec): `/architect seller catalog, listings, and inventory journey`
 
-### 19. Promotions, coupons, and campaigns · needs a decision
-Create discounts and campaigns with eligibility and usage limits, including funding and allocation rules across multiple sellers and CareU.
-**Done when:** a promotion can be applied within its rules, and its funding and allocation are recorded clearly on the affected orders.
-- [ ] Design it (spec): `/architect promotions, coupons, and campaigns`
+### 16. Seller orders, fulfillment, and delivery journey · needs a decision
+Prototype seller order management: order and shipment lists, detail views, fulfillment status steps, delivery and tracking fields, and proof of delivery capture views as UI only mock flows.
+**Done when:** a mock seller can review orders, progress shipment states, and view delivery details through complete UI flows.
+- [ ] Design it (spec): `/architect seller orders, fulfillment, and delivery journey`
 
-### 20. Reviews and ratings · needs a decision
-Let verified purchasers leave one review per eligible product, edit or report reviews, and show trusted feedback on the storefront.
-**Done when:** only eligible purchases can create reviews, reviews can be managed fairly, and product pages show accurate review information.
-- [ ] Design it (spec): `/architect reviews and ratings`
+### 17. Seller earnings, payouts, and support journey · needs a decision
+Prototype seller facing money and help views: commission and balance summaries, payout history, COD related status views, and support or dispute entry points, clearly separated from CareU first party treatment in labels and mock data.
+**Done when:** a mock seller can understand earnings, payout, and support screens with clear states and no real financial processing.
+- [ ] Design it (spec): `/architect seller earnings, payouts, and support journey`
 
-### 21. Analytics and reporting · needs a decision
-Provide seller facing and CareU facing reports for sales, orders, inventory, returns, commissions, and payouts, keeping first party and marketplace views separate where needed.
-**Done when:** authorized users can see the reports relevant to their scope without exposing another seller's or restricted CareU data.
-- [ ] Design it (spec): `/architect analytics and reporting`
+## Phase 3: Platform and admin journeys (UI prototype)
 
-### 22. Public site SEO and legal basics · needs a decision
-Strengthen public pages with crawlable content, metadata, canonicals, sitemap coverage, structured data where supported, and clear privacy, terms, and consent pages.
-**Done when:** indexable public pages have correct SEO signals and users can access basic privacy, terms, and consent information.
-- [ ] Design it (spec): `/architect public site seo and legal basics`
+Build each platform and admin journey as a complete clickable flow on placeholder and mock data, including navigation and empty, loading, error, and success states, before moving to the next journey.
 
-### 27. Site content management (CMS) for company roles · needs a decision
-Let authorized company roles edit selected site content such as pages, homepage sections, banners, and announcements without writing code, in a way that keeps the storefront fast.
-**Done when:** authorized roles can create and update the selected content areas without code, and published changes appear on the site without harming performance.
-- [ ] Design it (spec): `/architect site content management for company roles`
+### 18. Platform admin shell and overview journey · needs a decision
+Prototype the platform admin shell: navigation, overview dashboard, key metrics cards, alerts, and role aware entry points inspired by the reference admin demo but adapted to CareU operations.
+**Done when:** a mock platform user can move through the admin home and reach each admin area with consistent layout and states.
+- [ ] Design it (spec): `/architect platform admin shell and overview journey`
 
-### 28. Super admin theme customization · needs a decision
-Let a super admin adjust approved visual theme settings, such as colors and branding, at any time without code changes, while keeping the site fast and consistent.
-**Done when:** a super admin can change approved theme settings and the storefront reflects them safely without hurting performance or breaking the design system.
-- [ ] Design it (spec): `/architect super admin theme customization`
+### 19. Platform seller, shop, and listing moderation journey · needs a decision
+Prototype admin screens for seller applications, shop approvals and status, listing review and moderation, and trust actions using mock records and review states.
+**Done when:** a mock admin can review sellers, shops, and listings through complete approval, rejection, and moderation UI flows.
+- [ ] Design it (spec): `/architect platform seller, shop, and listing moderation journey`
+
+### 20. Platform catalog, pricing, and inventory operations journey · needs a decision
+Prototype CareU and platform catalog operations: categories and attributes, CareU first party products and pricing views, procurement and stock operation screens, and low stock states on mock data.
+**Done when:** a mock platform operator can navigate catalog, pricing, and inventory screens and see clear operational states without real writes.
+- [ ] Design it (spec): `/architect platform catalog, pricing, and inventory operations journey`
+
+### 21. Platform orders, payments, COD, and delivery operations journey · needs a decision
+Prototype operations screens for orders, shipments, payment states, cash on delivery tracking, delivery assignment, and tracking oversight, reflecting CareU ownership of COD workflows in labels and states.
+**Done when:** a mock operations user can inspect and progress order, payment, COD, and delivery UI flows with complete states on mock data.
+- [ ] Design it (spec): `/architect platform orders, payments, cod, and delivery operations journey`
+
+### 22. Platform returns, refunds, disputes, support, and settlements journey · needs a decision
+Prototype admin and finance adjacent screens for returns, refunds, disputes, support cases, seller balances, and payout batches, keeping support and financial views clearly separated in the UI.
+**Done when:** a mock authorized user can follow review and resolution style flows and see recorded outcomes and money impact states in UI only.
+- [ ] Design it (spec): `/architect platform returns, refunds, disputes, support, and settlements journey`
+
+### 23. Platform content, theme, notifications, and analytics journey · needs a decision
+Prototype content and governance screens: homepage and page content editing, theme settings, notification templates and history views, and seller versus CareU analytics views, all on mock data.
+**Done when:** a mock authorized user can move through content, theme, notification, and reporting screens with clear scope separation and complete UI states.
+- [ ] Design it (spec): `/architect platform content, theme, notifications, and analytics journey`
+
+## After UI approval
+
+### 24. UI approval checkpoint and backend wiring plan · needs a decision
+Review the completed prototype journeys, capture feedback, and turn approved UI into a concrete backend wiring plan that maps each flow to real data, auth, permissions, payments, inventory, and integrations.
+**Done when:** approved and changed UI areas are recorded, and the next backend wiring features and decisions are ready to design in order.
+- [ ] Design it (spec): `/architect ui approval checkpoint and backend wiring plan`
+
+## Later: backend wiring and production logic (after UI approval)
+
+These features reintroduce the real marketplace behavior behind the approved UI. They remain planned until the UI is approved. Real database writes, real auth enforcement, payment and IPN handling, stock reservation, integrations, and production correctness work happen here, not in the prototype phases.
+
+### 25. Wire foundations, auth, roles, and media to the UI · needs a decision
+Connect approved UI to real auth, permission checks, and media handling: resume feature 3 backend completion, enforce server side access, and replace placeholder access with real sessions and controlled file flows.
+**Done when:** approved screens use real session, role, permission, and media behavior where required, with server side enforcement and no placeholder access leaks.
+- [ ] Design it (spec): `/architect wire foundations, auth, roles, and media to the ui`
+
+### 26. Wire customer commerce and fulfillment flows · needs a decision
+Connect approved customer journeys to real catalog data, cart persistence as decided, server checked checkout, stock reservation, order creation, payments and COD handling, fulfillment, and sign in required tracking.
+**Done when:** a real customer can browse, buy, pay or place COD, and track orders through verified, correct, and auditable flows behind the approved UI.
+- [ ] Design it (spec): `/architect wire customer commerce and fulfillment flows`
+
+### 27. Wire seller operations and marketplace money flows · needs a decision
+Connect approved seller journeys to real onboarding, shop management, listings, inventory, fulfillment, commissions, balances, COD reconciliation, and settlements with correct CareU versus third party separation.
+**Done when:** seller operations and marketplace money handling work end to end with correct scope, snapshots, and auditable records behind the approved UI.
+- [ ] Design it (spec): `/architect wire seller operations and marketplace money flows`
+
+### 28. Wire platform operations, governance, and reporting · needs a decision
+Connect approved admin journeys to real moderation, operations, returns and disputes, support, content publishing, notifications, analytics, and governance controls with proper separation of duties.
+**Done when:** platform staff can operate the marketplace through real, authorized, and auditable workflows behind the approved UI.
+- [ ] Design it (spec): `/architect wire platform operations, governance, and reporting`
 
 ## Future
 
@@ -247,7 +291,7 @@ Offer a virtual tryout experience with a dummy mannequin so customers can previe
 Out of scope for the current roadmap pass, kept so the plan stays honest.
 - **Advanced procurement and supplier workflows**: deeper purchasing, supplier management, and receiving flows beyond basic receipts · needs a decision
 - **Courier API integrations**: automated courier booking and live courier status updates · needs a decision
-- **Guest checkout**: buying without a customer account · needs a decision
+- **Guest checkout**: buying without a customer account · needs a decision (confirmed not in launch policy; UI prototype follows sign in required checkout)
 - **Backorders and preorders**: selling items before stock is available · needs a decision
 
 ## Legend
@@ -271,4 +315,4 @@ Out of scope for the current roadmap pass, kept so the plan stays honest.
 - **Approach tag** beside a heading (e.g. `· Facade`) overrides the project default for that feature; no tag = inherits it.
 - **Workflow tier tag** beside a heading (e.g. `· GA`, `· Prototype`) sets that one feature's rigor above or below the project default; no tag inherits the default.
 - **Workflow** (header line) is the project default, what runs after `/develop`: **Prototype** = nothing; **Alpha** = `/check verify`; **Beta** = `/check verify` then `/test`; **GA** = adds a fresh model `/check review` then `/document`.
-- **Pointer line** (`spec <n> · code in <path>`): the spec link added by `/architect`, the code path by `/develop`.
+- **Pointer line** (`spec <n> · code in <path>`): the spec link added by `/architect`, the code path by `/develop`.
