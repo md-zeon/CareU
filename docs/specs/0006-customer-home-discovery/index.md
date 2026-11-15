@@ -1,7 +1,7 @@
 # 0006. Customer home and discovery journey
 
 **Date**: 2026-11-14
-**Status**: In Progress
+**Status**: Accepted
 
 ## Summary
 

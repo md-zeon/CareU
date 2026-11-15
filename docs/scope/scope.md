@@ -22,7 +22,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 3 | Media storage and secure file handling | Existing foundations (backend later) | in-progress |
 | 4 | UI prototype foundation and mock data | UI foundations | done |
 | 5 | Prototype access and journey switcher | UI foundations | done |
-| 6 | Customer home and discovery journey | Phase 1 · Customer journeys | in-progress |
+| 6 | Customer home and discovery journey | Phase 1 · Customer journeys | done |
 | 7 | Customer browse, search, and brand journey | Phase 1 · Customer journeys | planned |
 | 8 | Customer product and review journey | Phase 1 · Customer journeys | planned |
 | 9 | Customer cart and wishlist journey | Phase 1 · Customer journeys | planned |
@@ -149,7 +149,7 @@ spec [0005](../specs/0005-prototype-access-and-journey-switcher/index.md) · cod
 
 Build each customer journey as a complete clickable flow on placeholder and mock data, including navigation and empty, loading, error, and success states, before moving to the next journey.
 
-### 6. Customer home and discovery journey · in-progress
+### 6. Customer home and discovery journey · done
 Prototype the storefront home and discovery experience: hero and merchandising sections, category and brand entry points, promotions and editorial style highlights, header and footer navigation, inspired by the reference sites and adapted to CareU.
 **Done when:** a visitor can move through home, featured sections, and entry points into browse flows with believable content and all key page states.
 spec [0006](../specs/0006-customer-home-discovery/index.md) · code in `lib/mock/home/`, `components/storefront/home/`, `app/[locale]/(storefront)/page.tsx`, `app/[locale]/(storefront)/category/[slug]/page.tsx`, `app/[locale]/(storefront)/product/[slug]/page.tsx`, `app/[locale]/(storefront)/brand/[slug]/page.tsx`, `app/[locale]/(storefront)/campaign/[slug]/page.tsx`, `app/[locale]/(storefront)/prototype/page.tsx`

@@ -5,8 +5,8 @@ _Steps derived from spec 0006 acceptance criteria and value sourcing. `/check ve
 - [x] Visit `/en` and `/bn`: home renders hero, trust strip, featured categories, promotions, featured products, brand highlights, editorial, and closing links in a coherent order with believable localized content → AC-1, AC-2, AC-4
 - [x] Confirm hero, category, product, brand, campaign, and closing links navigate to real prototype routes (including `/category/[slug]`, `/product/[slug]`, `/brand/[slug]`, `/campaign/[slug]`, `/search`, `/account` as used) without dead ends; unknown slugs show a prototype safe not found/placeholder state → AC-3
 - [x] Confirm featured product prices display in BDT (integer poisha formatted), shop context is visible (CareU vs marketplace seller), and content is adapted for CareU in both English and Bangla → AC-4
-- [ ] Open `/en/prototype` and `/bn/prototype`: confirm home discovery previews demonstrate default, loading, empty, and error states; error preview includes a clear retry affordance and returns to content after retry → AC-5
-- [ ] Resize to mobile/tablet/desktop widths: layout remains responsive, images keep stable dimensions/aspect ratios, and no obvious layout shift or overflow is introduced → AC-5
+- [x] Open `/en/prototype` and `/bn/prototype`: confirm home discovery previews demonstrate default, loading, empty, and error states; error preview includes a clear retry affordance and returns to content after retry → AC-5
+- [x] Resize to mobile/tablet/desktop widths: layout remains responsive, images keep stable dimensions/aspect ratios, and no obvious layout shift or overflow is introduced → AC-5
 - [x] Confirm prototype boundaries in UI/copy: mock content only, no real orders/payments/stock reservation/auth enforcement claims, no guest checkout promise, and no public order tracking promise conflicting with CareU policy → AC-6
 
 ## Commands
