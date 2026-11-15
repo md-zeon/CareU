@@ -77,7 +77,7 @@ export const prototypePersonaOptions: PrototypePersonaOption[] = [
 ];
 
 export const prototypeJourneyShortcuts: PrototypeJourneyShortcut[] = [
-  { id: "general-home", label: l("Home", "হোম"), href: "/", area: "general", requiresSignIn: false, status: "planned" },
+  { id: "general-home", label: l("Home", "হোম"), href: "/", area: "general", requiresSignIn: false, status: "available" },
   { id: "general-prototype", label: l("Prototype foundation", "প্রোটোটাইপ ফাউন্ডেশন"), href: "/prototype", area: "general", requiresSignIn: false, status: "available" },
   { id: "general-login", label: l("Sign in screen", "সাইন ইন স্ক্রিন"), href: "/login", area: "general", requiresSignIn: false, status: "available" },
   { id: "customer-search", label: l("Search", "সার্চ"), href: "/search", area: "customer", requiresSignIn: false, status: "planned" },

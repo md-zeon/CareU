@@ -22,7 +22,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 3 | Media storage and secure file handling | Existing foundations (backend later) | in-progress |
 | 4 | UI prototype foundation and mock data | UI foundations | done |
 | 5 | Prototype access and journey switcher | UI foundations | done |
-| 6 | Customer home and discovery journey | Phase 1 · Customer journeys | planned |
+| 6 | Customer home and discovery journey | Phase 1 · Customer journeys | in-progress |
 | 7 | Customer browse, search, and brand journey | Phase 1 · Customer journeys | planned |
 | 8 | Customer product and review journey | Phase 1 · Customer journeys | planned |
 | 9 | Customer cart and wishlist journey | Phase 1 · Customer journeys | planned |
@@ -149,10 +149,16 @@ spec [0005](../specs/0005-prototype-access-and-journey-switcher/index.md) · cod
 
 Build each customer journey as a complete clickable flow on placeholder and mock data, including navigation and empty, loading, error, and success states, before moving to the next journey.
 
-### 6. Customer home and discovery journey · needs a decision
+### 6. Customer home and discovery journey · in-progress
 Prototype the storefront home and discovery experience: hero and merchandising sections, category and brand entry points, promotions and editorial style highlights, header and footer navigation, inspired by the reference sites and adapted to CareU.
 **Done when:** a visitor can move through home, featured sections, and entry points into browse flows with believable content and all key page states.
-- [ ] Design it (spec): `/architect customer home and discovery journey`
+spec [0006](../specs/0006-customer-home-discovery/index.md) · code in `lib/mock/home/`, `components/storefront/home/`, `app/[locale]/(storefront)/page.tsx`, `app/[locale]/(storefront)/category/[slug]/page.tsx`, `app/[locale]/(storefront)/product/[slug]/page.tsx`, `app/[locale]/(storefront)/brand/[slug]/page.tsx`, `app/[locale]/(storefront)/campaign/[slug]/page.tsx`, `app/[locale]/(storefront)/prototype/page.tsx`
+- [x] Design it (spec): `/architect customer home and discovery journey`
+- [x] Build it: `/develop customer home and discovery journey`
+  - [x] Milestone 1: add the home discovery mock contract, fixtures, scenario helpers, and composed getters that reuse existing catalog, brand, and product mocks, satisfies **AC-1**, **AC-2**, **AC-4**, **AC-5**, **AC-6**
+  - [x] Milestone 2: build reusable, server first home section blocks (hero, trust strip, featured categories, promotions, featured products, brand highlights, editorial, closing links) with responsive, performance minded layout, satisfies **AC-1**, **AC-2**, **AC-4**, **AC-5**
+  - [x] Milestone 3: compose the storefront home route and add navigable prototype placeholder routes for category, product, brand, and campaign discovery targets, satisfies **AC-1**, **AC-2**, **AC-3**, **AC-4**, **AC-5**, **AC-6**
+  - [x] Milestone 4: add scenario preview coverage and a resilience pass (loading, empty, error handling, safe fallbacks, and prototype boundary checks), satisfies **AC-3**, **AC-4**, **AC-5**, **AC-6**
 
 ### 7. Customer browse, search, and brand journey · needs a decision
 Prototype category, collection, search, and brand browsing with filters, sorting, pagination or load more, breadcrumbs, and clear empty and no result states on mock catalog data.

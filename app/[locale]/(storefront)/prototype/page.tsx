@@ -1,12 +1,27 @@
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PageContainer, PageHeader, Section, CardShell, CardContent, CardHeader, ListShell, ListItem, DetailShell, Stack, ResponsiveGrid } from "@/components/storefront/primitives";
+import {
+  PageContainer,
+  PageHeader,
+  Section,
+  CardShell,
+  CardContent,
+  CardHeader,
+  ListShell,
+  ListItem,
+  DetailShell,
+  Stack,
+  ResponsiveGrid,
+} from "@/components/storefront/primitives";
 import { LoadingState, EmptyState, SuccessState, FormField } from "@/components/storefront/states";
 import { RetryDemo } from "@/components/prototype/RetryDemo";
+import { HomeDiscoveryContent, type HomeMessages } from "@/components/storefront/home/HomeDiscoveryContent";
+import { HomeDiscoveryRetryPreview } from "@/components/prototype/HomeDiscoveryRetryPreview";
 import {
+  getHomeDiscovery,
   getMockAnalyticsCards,
   getMockCategories,
   getMockOrders,
@@ -16,6 +31,7 @@ import {
   type MockScenario,
 } from "@/lib/mock";
 import { formatPrice } from "@/lib/catalog/price";
+import type { Locale } from "@/lib/i18n/routing";
 
 export const metadata: Metadata = {
   title: "Prototype Foundation",
@@ -25,8 +41,11 @@ export const metadata: Metadata = {
 const scenarios: MockScenario[] = ["default", "empty", "loading", "error", "success"];
 
 export default async function PrototypeShowcasePage() {
+  const locale = (await getLocale()) as Locale;
   const t = await getTranslations("Prototype");
   const tp = await getTranslations("Pages");
+  const th = await getTranslations("Home");
+
   const categories = getMockCategories({ scenario: "default" }).data ?? [];
   const products = getMockProducts({ scenario: "default" }).data ?? [];
   const orders = getMockOrders({ scenario: "default" }).data ?? [];
@@ -37,6 +56,38 @@ export default async function PrototypeShowcasePage() {
   const loadingResult = getMockProducts({ scenario: "loading" });
   const errorResult = getMockProducts({ scenario: "error" });
 
+  const homeMessages: HomeMessages = {
+    trustTitle: th("trustTitle"),
+    featuredCategoriesTitle: th("featuredCategoriesTitle"),
+    featuredCategoriesDescription: th("featuredCategoriesDescription"),
+    promotionsTitle: th("promotionsTitle"),
+    promotionsDescription: th("promotionsDescription"),
+    featuredProductsTitle: th("featuredProductsTitle"),
+    featuredProductsDescription: th("featuredProductsDescription"),
+    brandsTitle: th("brandsTitle"),
+    brandsDescription: th("brandsDescription"),
+    closingTitle: th("closingTitle"),
+    closingDescription: th("closingDescription"),
+    viewCategory: th("viewCategory"),
+    viewProduct: th("viewProduct"),
+    viewBrand: th("viewBrand"),
+    fromCareu: th("fromCareu"),
+    fromSeller: th("fromSeller"),
+    ratingLabel: th("ratingLabel"),
+    reviewsLabel: th("reviewsLabel"),
+    sectionEmptyTitle: th("sectionEmptyTitle"),
+    sectionEmptyMessage: th("sectionEmptyMessage"),
+    pageErrorTitle: th("pageErrorTitle"),
+    pageErrorMessage: th("pageErrorMessage"),
+    loadingTitle: th("loadingTitle"),
+    loadingMessage: th("loadingMessage"),
+    prototypeNote: th("prototypeNote"),
+  };
+
+  const homeDefault = getHomeDiscovery({ scenario: "default" });
+  const homeLoading = getHomeDiscovery({ scenario: "loading" });
+  const homeEmpty = getHomeDiscovery({ scenario: "empty" });
+
   return (
     <PageContainer className="space-y-10 py-10 sm:py-14">
       <PageHeader
@@ -45,6 +96,49 @@ export default async function PrototypeShowcasePage() {
         description={t("description")}
         actions={<Badge variant="secondary">Facade · Prototype</Badge>}
       />
+
+      <Section id="home-discovery" title="Home and discovery journey" description="Feature 6 preview: hero, trust, categories, campaigns, featured products, brands, editorial, and closing links in default, loading, empty, and error scenarios.">
+        <div className="space-y-8">
+          <CardShell className="overflow-hidden">
+            <CardHeader>
+              <h3 className="font-semibold">Default state</h3>
+              <p className="text-sm text-muted-foreground">Believable mock content, BDT pricing, and navigable prototype links.</p>
+            </CardHeader>
+            <div className="border-t">
+              <HomeDiscoveryContent result={homeDefault} locale={locale} messages={homeMessages} />
+            </div>
+          </CardShell>
+
+          <div className="grid gap-6 xl:grid-cols-2">
+            <CardShell className="overflow-hidden">
+              <CardHeader>
+                <h3 className="font-semibold">Loading state</h3>
+              </CardHeader>
+              <div className="border-t">
+                <HomeDiscoveryContent result={homeLoading} locale={locale} messages={homeMessages} />
+              </div>
+            </CardShell>
+            <CardShell className="overflow-hidden">
+              <CardHeader>
+                <h3 className="font-semibold">Empty state</h3>
+              </CardHeader>
+              <div className="border-t">
+                <HomeDiscoveryContent result={homeEmpty} locale={locale} messages={homeMessages} />
+              </div>
+            </CardShell>
+          </div>
+
+          <CardShell className="overflow-hidden">
+            <CardHeader>
+              <h3 className="font-semibold">Error state with retry (showcase)</h3>
+              <p className="text-sm text-muted-foreground">Clear error and recovery affordance in prototype preview context.</p>
+            </CardHeader>
+            <div className="border-t">
+              <HomeDiscoveryRetryPreview locale={locale} messages={homeMessages} retryLabel={th("retry")} />
+            </div>
+          </CardShell>
+        </div>
+      </Section>
 
       <Section id="layout" title={t("layoutTitle")} description={t("layoutDescription")}>
         <DetailShell>
@@ -77,7 +171,7 @@ export default async function PrototypeShowcasePage() {
               <CardContent className="space-y-2 text-sm">
                 <p><span className="font-medium">{t("shopLabel")}:</span> {shops[0]?.name.en} ({t("careuShop")})</p>
                 <p><span className="font-medium">{t("orderLabel")}:</span> {orders[0]?.orderNumber}</p>
-                <p><span className="font-medium">{t("totalLabel")}:</span> {formatPrice(BigInt(orders[0]?.grandTotalBdt ?? 0), "en")}</p>
+                <p><span className="font-medium">{t("totalLabel")}:</span> {formatPrice(BigInt(orders[0]?.grandTotalBdt ?? 0), locale)}</p>
               </CardContent>
             </CardShell>
             <ListShell>
@@ -85,10 +179,10 @@ export default async function PrototypeShowcasePage() {
               {categories.slice(0, 4).map((c) => (
                 <ListItem key={c.id}>
                   <div>
-                    <p className="font-medium">{c.name.en}</p>
+                    <p className="font-medium">{locale === "bn" ? c.name.bn : c.name.en}</p>
                     <p className="text-sm text-muted-foreground">{c.slug}</p>
                   </div>
-                  <Badge variant="outline">{c.name.bn}</Badge>
+                  <Badge variant="outline">{locale === "bn" ? c.name.en : c.name.bn}</Badge>
                 </ListItem>
               ))}
             </ListShell>
@@ -144,6 +238,7 @@ export default async function PrototypeShowcasePage() {
               <p><span className="font-medium">empty:</span> {Array.isArray(emptyResult.data) ? emptyResult.data.length : "n/a"} items</p>
               <p><span className="font-medium">loading:</span> {loadingResult.scenario === "loading" ? "null data" : "n/a"}</p>
               <p><span className="font-medium">error:</span> {errorResult.scenario === "error" ? errorResult.message.en : "n/a"}</p>
+              <p><span className="font-medium">home default:</span> {homeDefault.scenario === "default" && homeDefault.data.featuredProducts.length} featured products</p>
             </CardContent>
           </CardShell>
           <CardShell>
@@ -151,6 +246,7 @@ export default async function PrototypeShowcasePage() {
             <CardContent>
               <ul className="grid gap-2 text-sm sm:grid-cols-2">
                 <li>Catalog: {categories.length} categories, {products.length} products</li>
+                <li>Home: hero, trust, categories, campaigns, products, brands, editorial, closing links</li>
                 <li>Shops & sellers: {shops.length} shops</li>
                 <li>Personas: {personas.length} views</li>
                 <li>Orders: {orders.length} orders</li>
@@ -160,7 +256,7 @@ export default async function PrototypeShowcasePage() {
             </CardContent>
           </CardShell>
         </div>
-        <p className="text-xs text-muted-foreground">Prototype only: mock data, no real database reads or writes, no real auth enforcement. Placeholder routes remain navigable: {tp("search")}, {tp("cart")}, {tp("wishlist")}, {tp("account")}, {tp("trackOrder")}.</p>
+        <p className="text-xs text-muted-foreground">Prototype only: mock data, no real database reads or writes, no real auth enforcement. Placeholder routes remain navigable: {tp("search")}, {tp("cart")}, {tp("wishlist")}, {tp("account")}, {tp("trackOrder")}, category/product/brand/campaign pages.</p>
       </Section>
     </PageContainer>
   );
