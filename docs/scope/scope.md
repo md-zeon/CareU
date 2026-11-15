@@ -23,7 +23,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 4 | UI prototype foundation and mock data | UI foundations | done |
 | 5 | Prototype access and journey switcher | UI foundations | done |
 | 6 | Customer home and discovery journey | Phase 1 · Customer journeys | done |
-| 7 | Customer browse, search, and brand journey | Phase 1 · Customer journeys | planned |
+| 7 | Customer browse, search, and brand journey | Phase 1 · Customer journeys | done |
 | 8 | Customer product and review journey | Phase 1 · Customer journeys | planned |
 | 9 | Customer cart and wishlist journey | Phase 1 · Customer journeys | planned |
 | 10 | Customer checkout and order confirmation journey | Phase 1 · Customer journeys | planned |
@@ -160,10 +160,16 @@ spec [0006](../specs/0006-customer-home-discovery/index.md) · code in `lib/mock
   - [x] Milestone 3: compose the storefront home route and add navigable prototype placeholder routes for category, product, brand, and campaign discovery targets, satisfies **AC-1**, **AC-2**, **AC-3**, **AC-4**, **AC-5**, **AC-6**
   - [x] Milestone 4: add scenario preview coverage and a resilience pass (loading, empty, error handling, safe fallbacks, and prototype boundary checks), satisfies **AC-3**, **AC-4**, **AC-5**, **AC-6**
 
-### 7. Customer browse, search, and brand journey · needs a decision
+### 7. Customer browse, search, and brand journey · done
 Prototype category, collection, search, and brand browsing with filters, sorting, pagination or load more, breadcrumbs, and clear empty and no result states on mock catalog data.
 **Done when:** a customer can browse categories and brands, refine results, search, and open products through a complete, navigable UI flow with its states.
-- [ ] Design it (spec): `/architect customer browse, search, and brand journey`
+spec [0007](../specs/0007-customer-browse-search-brand-journey/index.md) · code in `lib/mock/browse/`, `components/storefront/browse/`, `components/storefront/header/SearchBar.tsx`, `components/storefront/header/SearchAutocomplete.tsx`, `app/[locale]/(storefront)/category/[slug]/page.tsx`, `app/[locale]/(storefront)/brand/[slug]/page.tsx`, `app/[locale]/(storefront)/search/page.tsx`, `app/[locale]/(storefront)/collection/[slug]/page.tsx`, `app/[locale]/(storefront)/prototype/page.tsx`, `lib/i18n/messages/en.json`, `lib/i18n/messages/bn.json`
+- [x] Design it (spec): `/architect customer browse, search, and brand journey`
+- [x] Build it: `/develop customer browse, search, and brand journey`
+  - [x] Milestone 1: add browse and collection mock contracts, deterministic support data, URL state parsing, and shared resolver/getter logic for cards, facets, sort, pagination, breadcrumbs, suggestions, and composed page results, satisfies **AC-1**, **AC-2**, **AC-3**, **AC-4**, **AC-5**, **AC-6**, **AC-7**
+  - [x] Milestone 2: build reusable server first browse UI (breadcrumbs, responsive filter panel or drawer with active chips, sort, rich product grid/cards, pagination, and state blocks) and compose upgraded category, brand, search routes plus the new collection route, satisfies **AC-1**, **AC-2**, **AC-3**, **AC-4**, **AC-5**, **AC-6**, **AC-7**
+  - [x] Milestone 3: add header search autocomplete and clickable UI only wishlist/cart quick action feedback with local client state, satisfies **AC-4**, **AC-5**, **AC-7**
+  - [x] Milestone 4: add prototype showcase/state preview coverage and complete responsive, accessibility, fallback, and boundary checks across all browse surfaces, satisfies **AC-1**, **AC-2**, **AC-3**, **AC-4**, **AC-5**, **AC-6**, **AC-7**
 
 ### 8. Customer product and review journey · needs a decision
 Prototype product detail pages with galleries, variant selection, price and availability display, seller or shop context, related products, and review presentation on mock data, including future facing space for supported experiences.

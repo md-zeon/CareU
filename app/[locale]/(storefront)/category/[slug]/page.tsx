@@ -1,65 +1,57 @@
-import { getLocale, getTranslations } from "next-intl/server";
-import { PageContainer, PageHeader, Section } from "@/components/storefront/primitives";
-import { EmptyState } from "@/components/storefront/states";
-import { mockCategories } from "@/lib/mock/catalog";
-import { findBySlug, l } from "@/lib/mock/types";
+import type { Metadata } from "next";
+import { getLocale } from "next-intl/server";
 import type { Locale } from "@/lib/i18n/routing";
+import { getCategoryBrowseResult } from "@/lib/mock/browse";
+import { BrowseView } from "@/components/storefront/browse/BrowseView";
+import { mockCategories } from "@/lib/mock/catalog";
 
 export const instant = false;
-
-function pick(text: { en: string; bn: string }, locale: Locale) {
-  return locale === "bn" ? text.bn : text.en;
-}
 
 export function generateStaticParams() {
   return mockCategories.map((category) => ({ slug: category.slug }));
 }
 
-export default async function CategoryPlaceholderPage({
+export async function generateMetadata({
   params,
 }: {
   params: Promise<{ locale: string; slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const result = getCategoryBrowseResult(slug, new URLSearchParams(), { scenario: "default" });
+  if (result.scenario === "loading" || result.scenario === "error" || !result.data) {
+    return { title: "Category", robots: { index: false, follow: true } };
+  }
+  const locale = (await getLocale()) as Locale;
+  const title = locale === "bn" ? result.data.title.bn : result.data.title.en;
+  return { title, robots: { index: false, follow: true } };
+}
+
+export default async function CategoryPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string; slug: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const { slug } = await params;
+  const sp = await searchParams;
   const locale = (await getLocale()) as Locale;
-  const t = await getTranslations("Pages");
-  const placeholder = await getTranslations("Placeholder");
-  const category = findBySlug(mockCategories, slug);
-
-  if (!category) {
-    return (
-      <PageContainer className="space-y-6 py-10 sm:py-14">
-        <PageHeader
-          title={pick(l("Category not found in prototype", "প্রোটোটাইপে ক্যাটাগরি পাওয়া যায়নি"), locale)}
-          description={placeholder("message")}
-        />
-        <EmptyState
-          title={pick(l("Unknown category", "অজানা ক্যাটাগরি"), locale)}
-          message={pick(l("This prototype link points to a category that is not in the mock data yet.", "এই প্রোটোটাইপ লিংকটি এমন একটি ক্যাটাগরির দিকে যায় যা এখনো মক ডাটায় নেই।"), locale)}
-        />
-      </PageContainer>
-    );
+  const scenario = (typeof sp.scenario === "string" ? sp.scenario : undefined) as any;
+  const query = new URLSearchParams();
+  for (const [k, v] of Object.entries(sp)) {
+    if (k === "scenario") continue;
+    if (Array.isArray(v)) v.forEach((x) => query.append(k, x));
+    else if (v != null) query.set(k, v);
   }
+  const result = getCategoryBrowseResult(slug, query, scenario ? { scenario } : undefined);
 
-  return (
-    <PageContainer className="space-y-8 py-10 sm:py-14">
-      <PageHeader
-        eyebrow={pick(l("Prototype category", "প্রোটোটাইপ ক্যাটাগরি"), locale)}
-        title={pick(category.name, locale)}
-        description={category.description ? pick(category.description, locale) : placeholder("message")}
-      />
-      <Section title={pick(l("Browse journey coming soon", "ব্রাউজ জার্নি শীঘ্রই আসছে"), locale)}>
-        <EmptyState
-          title={t("search")}
-          message={pick(
-            l("Category browsing, filters, and product lists will be added in the customer browse journey.", "ক্যাটাগরি ব্রাউজিং, ফিল্টার এবং পণ্যের তালিকা কাস্টমার ব্রাউজ জার্নিতে যোগ করা হবে।"),
-            locale,
-          )}
-        />
-      </Section>
-      <p className="text-xs text-muted-foreground">
-        {pick(l("Prototype placeholder: mock data only, no real catalog queries.", "প্রোটোটাইপ প্লেসহোল্ডার: শুধু মক ডাটা, কোনো প্রকৃত ক্যাটালগ কুয়েরি নেই।"), locale)}
-      </p>
-    </PageContainer>
-  );
+  if (result.scenario === "error") {
+    return <BrowseView locale={locale} basePath={`/category/${slug}`} searchParamsString={query.toString()} result={{ kind: "error" }} mode="category" />;
+  }
+  if (!result.data) {
+    return <BrowseView locale={locale} basePath={`/category/${slug}`} searchParamsString={query.toString()} result={{ kind: "not_found" }} mode="category" />;
+  }
+  const data = result.data;
+  const kind = data.items.length === 0 ? "no_results" : "ok";
+  return <BrowseView locale={locale} basePath={`/category/${slug}`} searchParamsString={query.toString()} result={{ kind, data }} mode="category" />;
 }

@@ -1,16 +1,41 @@
-import { getTranslations } from "next-intl/server";
-import { PageContainer, PageHeader } from "@/components/storefront/primitives";
-import { EmptyState } from "@/components/storefront/states";
+import type { Metadata } from "next";
+import { getLocale } from "next-intl/server";
+import type { Locale } from "@/lib/i18n/routing";
+import { getSearchBrowseResult } from "@/lib/mock/browse";
+import { BrowseView } from "@/components/storefront/browse/BrowseView";
 
-/** Placeholder for the search results page (?q=…). */
-export default async function SearchPage() {
-  const t = await getTranslations("Pages");
-  const placeholder = await getTranslations("Placeholder");
+export const instant = false;
 
-  return (
-    <PageContainer className="space-y-6 py-10 sm:py-14">
-      <PageHeader title={t("search")} description={placeholder("message")} />
-      <EmptyState title={t("search")} message={placeholder("message")} />
-    </PageContainer>
-  );
+export const metadata: Metadata = {
+  robots: { index: false, follow: true },
+};
+
+export default async function SearchPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const sp = await searchParams;
+  const locale = (await getLocale()) as Locale;
+  const scenario = (typeof sp.scenario === "string" ? sp.scenario : undefined) as any;
+  const query = new URLSearchParams();
+  for (const [k, v] of Object.entries(sp)) {
+    if (k === "scenario") continue;
+    if (Array.isArray(v)) v.forEach((x) => query.append(k, x));
+    else if (v != null) query.set(k, v);
+  }
+  const result = getSearchBrowseResult(query, scenario ? { scenario } : undefined);
+
+  if (result.scenario === "error") {
+    return <BrowseView locale={locale} basePath="/search" searchParamsString={query.toString()} result={{ kind: "error" }} mode="search" />;
+  }
+  if (result.data === "empty_query") {
+    return <BrowseView locale={locale} basePath="/search" searchParamsString={query.toString()} result={{ kind: "empty_query" }} mode="search" />;
+  }
+  if (!result.data) {
+    return <BrowseView locale={locale} basePath="/search" searchParamsString={query.toString()} result={{ kind: "empty_query" }} mode="search" />;
+  }
+  const data = result.data;
+  const kind = data.items.length === 0 ? "no_results" : "ok";
+  return <BrowseView locale={locale} basePath="/search" searchParamsString={query.toString()} result={{ kind, data }} mode="search" />;
 }

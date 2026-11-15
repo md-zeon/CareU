@@ -21,13 +21,18 @@ import { RetryDemo } from "@/components/prototype/RetryDemo";
 import { HomeDiscoveryContent, type HomeMessages } from "@/components/storefront/home/HomeDiscoveryContent";
 import { HomeDiscoveryRetryPreview } from "@/components/prototype/HomeDiscoveryRetryPreview";
 import {
+  getBrandBrowseResult,
+  getCategoryBrowseResult,
+  getCollectionBrowseResult,
   getHomeDiscovery,
   getMockAnalyticsCards,
   getMockCategories,
+  getMockCollections,
   getMockOrders,
   getMockPersonas,
   getMockProducts,
   getMockShops,
+  getSearchBrowseResult,
   type MockScenario,
 } from "@/lib/mock";
 import { formatPrice } from "@/lib/catalog/price";
@@ -87,6 +92,13 @@ export default async function PrototypeShowcasePage() {
   const homeDefault = getHomeDiscovery({ scenario: "default" });
   const homeLoading = getHomeDiscovery({ scenario: "loading" });
   const homeEmpty = getHomeDiscovery({ scenario: "empty" });
+
+  const browseCategory = getCategoryBrowseResult("electronics", new URLSearchParams(), { scenario: "default" });
+  const browseCollection = getCollectionBrowseResult("everyday-tech-picks", new URLSearchParams(), { scenario: "default" });
+  const browseBrand = getBrandBrowseResult("careu-select", new URLSearchParams(), { scenario: "default" });
+  const browseSearch = getSearchBrowseResult(new URLSearchParams("q=phone"), { scenario: "default" });
+  const browseSearchEmpty = getSearchBrowseResult(new URLSearchParams("q=zzzz-not-found"), { scenario: "default" });
+  const browseCollections = getMockCollections({ scenario: "default" }).data ?? [];
 
   return (
     <PageContainer className="space-y-10 py-10 sm:py-14">
@@ -229,6 +241,36 @@ export default async function PrototypeShowcasePage() {
         </ResponsiveGrid>
       </Section>
 
+      <Section id="browse-search-brand" title="Customer browse, search, and brand journey" description="Feature 7 preview: category, collection, brand, and search surfaces on mock data with filters, sort, pagination, breadcrumbs, and states.">
+        <div className="grid gap-4 lg:grid-cols-2">
+          <CardShell>
+            <CardHeader><h3 className="font-semibold">Default browse results</h3></CardHeader>
+            <CardContent className="space-y-2 text-sm">
+              <p><span className="font-medium">Category (electronics):</span> {browseCategory.scenario === "default" && browseCategory.data ? `${browseCategory.data.totalCount} items` : "n/a"}</p>
+              <p><span className="font-medium">Collection (everyday tech):</span> {browseCollection.scenario === "default" && browseCollection.data ? `${browseCollection.data.totalCount} items` : "n/a"}</p>
+              <p><span className="font-medium">Brand (CareU Select):</span> {browseBrand.scenario === "default" && browseBrand.data ? `${browseBrand.data.totalCount} items` : "n/a"}</p>
+              <p><span className="font-medium">Search (phone):</span> {browseSearch.scenario === "default" && browseSearch.data && browseSearch.data !== "empty_query" ? `${browseSearch.data.totalCount} items` : "n/a"}</p>
+              <p><span className="font-medium">Search (no results):</span> {browseSearchEmpty.scenario === "default" && browseSearchEmpty.data && browseSearchEmpty.data !== "empty_query" ? `${browseSearchEmpty.data.totalCount} items` : "n/a"}</p>
+              <p><span className="font-medium">Collections:</span> {browseCollections.length}</p>
+            </CardContent>
+          </CardShell>
+          <CardShell>
+            <CardHeader><h3 className="font-semibold">Try prototype routes</h3></CardHeader>
+            <CardContent className="space-y-2 text-sm">
+              <ul className="list-disc space-y-1 pl-5 text-muted-foreground">
+                <li><a className="text-foreground underline underline-offset-4" href={`/${locale}/category/electronics`}>/category/electronics</a></li>
+                <li><a className="text-foreground underline underline-offset-4" href={`/${locale}/collection/everyday-tech-picks`}>/collection/everyday-tech-picks</a></li>
+                <li><a className="text-foreground underline underline-offset-4" href={`/${locale}/brand/careu-select`}>/brand/careu-select</a></li>
+                <li><a className="text-foreground underline underline-offset-4" href={`/${locale}/search?q=phone`}>/search?q=phone</a></li>
+                <li><a className="text-foreground underline underline-offset-4" href={`/${locale}/search`}>/search (empty query state)</a></li>
+                <li><a className="text-foreground underline underline-offset-4" href={`/${locale}/search?q=zzzz`}>/search?q=zzzz (no results)</a></li>
+              </ul>
+            </CardContent>
+          </CardShell>
+        </div>
+        <p className="text-xs text-muted-foreground">Browse journey uses mock data only: URL based filters/sort/pagination, UI only wishlist/cart quick actions, and no real backend, auth, payment, or stock writes.</p>
+      </Section>
+
       <Section id="mock-coverage" title={t("mockTitle")} description={t("mockDescription")}>
         <div className="grid gap-4 lg:grid-cols-2">
           <CardShell>
@@ -256,7 +298,7 @@ export default async function PrototypeShowcasePage() {
             </CardContent>
           </CardShell>
         </div>
-        <p className="text-xs text-muted-foreground">Prototype only: mock data, no real database reads or writes, no real auth enforcement. Placeholder routes remain navigable: {tp("search")}, {tp("cart")}, {tp("wishlist")}, {tp("account")}, {tp("trackOrder")}, category/product/brand/campaign pages.</p>
+        <p className="text-xs text-muted-foreground">Prototype only: mock data, no real database reads or writes, no real auth enforcement. Placeholder routes remain navigable: {tp("search")}, {tp("cart")}, {tp("wishlist")}, {tp("account")}, {tp("trackOrder")}, category/product/brand/campaign/collection pages.</p>
       </Section>
     </PageContainer>
   );

@@ -1,64 +1,57 @@
-import { getLocale, getTranslations } from "next-intl/server";
-import { PageContainer, PageHeader, Section } from "@/components/storefront/primitives";
-import { EmptyState } from "@/components/storefront/states";
-import { mockBrands } from "@/lib/mock/catalog";
-import { findBySlug, l } from "@/lib/mock/types";
+import type { Metadata } from "next";
+import { getLocale } from "next-intl/server";
 import type { Locale } from "@/lib/i18n/routing";
+import { getBrandBrowseResult } from "@/lib/mock/browse";
+import { BrowseView } from "@/components/storefront/browse/BrowseView";
+import { mockBrands } from "@/lib/mock/catalog";
 
 export const instant = false;
-
-function pick(text: { en: string; bn: string }, locale: Locale) {
-  return locale === "bn" ? text.bn : text.en;
-}
 
 export function generateStaticParams() {
   return mockBrands.map((brand) => ({ slug: brand.slug }));
 }
 
-export default async function BrandPlaceholderPage({
+export async function generateMetadata({
   params,
 }: {
   params: Promise<{ locale: string; slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const result = getBrandBrowseResult(slug, new URLSearchParams(), { scenario: "default" });
+  if (result.scenario === "loading" || result.scenario === "error" || !result.data) {
+    return { title: "Brand", robots: { index: false, follow: true } };
+  }
+  const locale = (await getLocale()) as Locale;
+  const title = locale === "bn" ? result.data.title.bn : result.data.title.en;
+  return { title, robots: { index: false, follow: true } };
+}
+
+export default async function BrandPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string; slug: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const { slug } = await params;
+  const sp = await searchParams;
   const locale = (await getLocale()) as Locale;
-  const placeholder = await getTranslations("Placeholder");
-  const brand = findBySlug(mockBrands, slug);
-
-  if (!brand) {
-    return (
-      <PageContainer className="space-y-6 py-10 sm:py-14">
-        <PageHeader
-          title={pick(l("Brand not found in prototype", "প্রোটোটাইপে ব্র্যান্ড পাওয়া যায়নি"), locale)}
-          description={placeholder("message")}
-        />
-        <EmptyState
-          title={pick(l("Unknown brand", "অজানা ব্র্যান্ড"), locale)}
-          message={pick(l("This prototype link points to a brand that is not in the mock data yet.", "এই প্রোটোটাইপ লিংকটি এমন একটি ব্র্যান্ডের দিকে যায় যা এখনো মক ডাটায় নেই।"), locale)}
-        />
-      </PageContainer>
-    );
+  const scenario = (typeof sp.scenario === "string" ? sp.scenario : undefined) as any;
+  const query = new URLSearchParams();
+  for (const [k, v] of Object.entries(sp)) {
+    if (k === "scenario") continue;
+    if (Array.isArray(v)) v.forEach((x) => query.append(k, x));
+    else if (v != null) query.set(k, v);
   }
+  const result = getBrandBrowseResult(slug, query, scenario ? { scenario } : undefined);
 
-  return (
-    <PageContainer className="space-y-8 py-10 sm:py-14">
-      <PageHeader
-        eyebrow={pick(l("Prototype brand", "প্রোটোটাইপ ব্র্যান্ড"), locale)}
-        title={pick(brand.name, locale)}
-        description={placeholder("message")}
-      />
-      <Section title={pick(l("Brand journey coming soon", "ব্র্যান্ড জার্নি শীঘ্রই আসছে"), locale)}>
-        <EmptyState
-          title={pick(brand.name, locale)}
-          message={pick(
-            l("Brand browsing and product discovery for this brand will be added in later customer journeys.", "এই ব্র্যান্ডের ব্রাউজিং এবং পণ্য ডিসকভারি পরবর্তী কাস্টমার জার্নিতে যোগ করা হবে।"),
-            locale,
-          )}
-        />
-      </Section>
-      <p className="text-xs text-muted-foreground">
-        {pick(l("Prototype placeholder: mock data only, no real brand catalog.", "প্রোটোটাইপ প্লেসহোল্ডার: শুধু মক ডাটা, কোনো প্রকৃত ব্র্যান্ড ক্যাটালগ নেই।"), locale)}
-      </p>
-    </PageContainer>
-  );
+  if (result.scenario === "error") {
+    return <BrowseView locale={locale} basePath={`/brand/${slug}`} searchParamsString={query.toString()} result={{ kind: "error" }} mode="brand" />;
+  }
+  if (!result.data) {
+    return <BrowseView locale={locale} basePath={`/brand/${slug}`} searchParamsString={query.toString()} result={{ kind: "not_found" }} mode="brand" />;
+  }
+  const data = result.data;
+  const kind = data.items.length === 0 ? "no_results" : "ok";
+  return <BrowseView locale={locale} basePath={`/brand/${slug}`} searchParamsString={query.toString()} result={{ kind, data }} mode="brand" />;
 }
