@@ -9,6 +9,9 @@ import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/catalog/price";
 import type { Locale } from "@/lib/i18n/routing";
 import type { ResolvedShopContext, ResolvedVariant } from "@/lib/mock/pdp";
+import { useWishlistActionGate } from "@/lib/prototype/useWishlistActionGate";
+import { getShopIdForProduct } from "@/lib/store/shared/resolve";
+import { useSharedStore, useSharedStoreActions } from "@/lib/store/shared/hooks";
 import { pickText, withLocale } from "@/components/storefront/home/home-utils";
 import { cn } from "@/lib/utils";
 
@@ -38,12 +41,14 @@ type Labels = {
 
 export function ProductPurchasePanel({
   locale,
+  productId,
   variants,
   selectedVariantId,
   shop,
   labels,
 }: {
   locale: Locale;
+  productId: string;
   variants: ResolvedVariant[];
   selectedVariantId: string | null;
   shop: ResolvedShopContext | null;
@@ -52,8 +57,17 @@ export function ProductPurchasePanel({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [wish, setWish] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
+  const actions = useSharedStoreActions();
+  const { run, gate } = useWishlistActionGate();
+  const variantId = useMemo(() => {
+    if (variants.length === 0) return null;
+    return (variants.find((v) => v.id === selectedVariantId) ?? variants[0]).id;
+  }, [variants, selectedVariantId]);
+  const shopId = shop?.shopId ?? getShopIdForProduct(productId, variantId);
+  const wishlisted = useSharedStore((state) =>
+    state.wishlistLines.some((line) => line.productId === productId && line.variantId === variantId),
+  );
 
   const selected = useMemo(() => {
     if (variants.length === 0) return null;
@@ -149,6 +163,7 @@ export function ProductPurchasePanel({
             className="flex-1"
             disabled={unavailable}
             onClick={() => {
+              actions.addToCart({ productId, variantId, shopId, quantity: 1 });
               flash(labels.addedToCart);
             }}
           >
@@ -157,16 +172,20 @@ export function ProductPurchasePanel({
           </Button>
           <Button
             type="button"
-            variant={wish ? "secondary" : "outline"}
+            variant={wishlisted ? "secondary" : "outline"}
             size="lg"
-            aria-pressed={wish}
-            onClick={() => {
-              setWish((v) => !v);
-              if (!wish) flash(labels.addedToWishlist);
-            }}
+            aria-pressed={wishlisted}
+            onClick={() =>
+              run(() => {
+                if (!wishlisted) {
+                  actions.addToWishlist({ productId, variantId, shopId });
+                  flash(labels.addedToWishlist);
+                }
+              })
+            }
           >
-            <HeartIcon className={cn("size-4", wish && "fill-current")} aria-hidden="true" />
-            {wish ? labels.addedToWishlist : labels.addToWishlist}
+            <HeartIcon className={cn("size-4", wishlisted && "fill-current")} aria-hidden="true" />
+            {wishlisted ? labels.addedToWishlist : labels.addToWishlist}
           </Button>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row">
@@ -226,6 +245,7 @@ export function ProductPurchasePanel({
           </div>
         </div>
       ) : null}
+      {gate}
     </div>
   );
 }

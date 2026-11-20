@@ -25,8 +25,8 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 6 | Customer home and discovery journey | Phase 1 · Customer journeys | done |
 | 7 | Customer browse, search, and brand journey | Phase 1 · Customer journeys | done |
 | 8 | Customer product and review journey | Phase 1 · Customer journeys | done |
-| 9 | Customer cart and wishlist journey | Phase 1 · Customer journeys | planned |
-| 10 | Customer checkout and order confirmation journey | Phase 1 · Customer journeys | planned |
+| 9 | Customer cart and wishlist journey | Phase 1 · Customer journeys | done |
+| 10 | Customer checkout and order confirmation journey | Phase 1 · Customer journeys | in-progress |
 | 11 | Customer account, addresses, orders, and tracking journey | Phase 1 · Customer journeys | planned |
 | 12 | Customer support and trust pages journey | Phase 1 · Customer journeys | planned |
 | 13 | Seller entry, onboarding, and shop setup journey | Phase 2 · Seller journeys | planned |
@@ -183,15 +183,29 @@ spec [0008](../specs/0008-customer-product-and-review-journey/index.md) · code 
   - [x] Milestone 4: compose the product route and wire interactions (server resolved data, variant URL sync, UI only wishlist/cart feedback, recently viewed prototype behavior, navigable placeholder handoff), satisfies **AC-1**, **AC-2**, **AC-3**, **AC-4**, **AC-5**, **AC-6**
   - [x] Milestone 5: add prototype state/scenario coverage and complete responsive, accessibility, bilingual, integer BDT, fallback, and boundary checks, satisfies **AC-1**, **AC-2**, **AC-3**, **AC-4**, **AC-5**, **AC-6**
 
-### 9. Customer cart and wishlist journey · needs a decision
+### 9. Customer cart and wishlist journey · done
 Prototype cart and wishlist screens as complete UI flows with item lists, quantity and selection changes, saved for later style states if useful, and clear empty and error states using browser side or mock data only.
 **Done when:** a signed in mock customer can add, view, update, and remove items in cart and wishlist and move onward to checkout or browsing.
-- [ ] Design it (spec): `/architect customer cart and wishlist journey`
+spec [0009](../specs/0009-customer-cart-and-wishlist-journey/index.md)
+- [x] Design it (spec): `/architect customer cart and wishlist journey`
+- [x] Build it: `/develop customer cart and wishlist journey`
+  - [x] Milestone 1: build the cart and wishlist page shells on mock data, with shop grouping, item rows, selection controls, summary, and empty, loading, and error states, satisfies **AC-1**, **AC-3**, **AC-4**, **AC-5**, **AC-10**, **AC-16**
+  - [x] Milestone 2: add the persisted Zustand store and mock catalog resolution helpers, satisfies **AC-11**, **AC-12**, **AC-13**, **AC-14**
+  - [x] Milestone 3: wire cart, saved for later, and wishlist actions to the store, including quantity caps, selection, moves, and quantity merge, satisfies **AC-1**, **AC-4**, **AC-6**, **AC-7**, **AC-8**, **AC-9**, **AC-12**
+  - [x] Milestone 4: integrate product and browse add actions and switch header counts to store selectors, satisfies **AC-11**, **AC-13**
+  - [x] Milestone 5: add the prototype sign in gates and the checkout placeholder route using only selected available items, satisfies **AC-2**, **AC-8**, **AC-15**
 
-### 10. Customer checkout and order confirmation journey · needs a decision
+### 10. Customer checkout and order confirmation journey
 Prototype the checkout flow on mock data: address selection, delivery option display, payment method selection screens (cash on delivery and online payment UI), order summary, confirmation, and failure states. Follow CareU policy: no guest checkout and no real stock reservation or payment processing.
 **Done when:** a mock signed in customer can complete or fail a checkout UI flow, see clear confirmation and error states, and understand per shop and total summaries without backend writes.
-- [ ] Design it (spec): `/architect customer checkout and order confirmation journey`
+spec [0010](../specs/0010-customer-checkout-and-order-confirmation-journey/index.md)
+- [x] Design it (spec): `/architect customer checkout and order confirmation journey`
+- [ ] Build it: `/develop customer checkout and order confirmation journey`
+  - [ ] Milestone 1: add `react-hook-form`, `zod`, and `@hookform/resolvers`, add checkout and confirmation message namespaces for `en` and `bn`, and create the `lib/mock/checkout` contracts, fixtures, scenario helpers, delivery rule table, order number generator, placement helper, and session storage helpers, satisfies **AC-2**, **AC-5**, **AC-7**, **AC-12**, **AC-13**, **AC-15**
+  - [ ] Milestone 2: build the one page checkout shell with the customer gate and the ordered address, delivery, payment, and summary sections, then wire cart selection and buy now draft creation with blocked empty and unavailable states, satisfies **AC-1**, **AC-2**, **AC-3**, **AC-4**, **AC-14**
+  - [ ] Milestone 3: implement the saved address picker and inline `react-hook-form` and `zod` address form, then the delivery and payment sections including the labeled mock gateway panel and the required failure states, satisfies **AC-6**, **AC-7**, **AC-8**, **AC-9**, **AC-10**
+  - [ ] Milestone 4: implement snapshot totals with `lib/money`, the late availability block, the disabled state and retry during placement, and the separate confirmation route with deterministic order number, per shop summary, and session storage refresh, satisfies **AC-11**, **AC-12**, **AC-13**
+  - [ ] Milestone 5: complete the prototype switcher scenario coverage and the bilingual, integer BDT, local asset, responsive, and state consistency pass, satisfies **AC-2**, **AC-9**, **AC-15**
 
 ### 11. Customer account, addresses, orders, and tracking journey · needs a decision
 Prototype customer account areas: profile, saved addresses, order history and detail, per shipment status views, and order tracking. Follow CareU policy: tracking requires sign in. Use mock order and shipment states.
@@ -324,6 +338,7 @@ Out of scope for the current roadmap pass, kept so the plan stays honest.
 - **Advanced procurement and supplier workflows**: deeper purchasing, supplier management, and receiving flows beyond basic receipts · needs a decision
 - **Courier API integrations**: automated courier booking and live courier status updates · needs a decision
 - **Guest checkout**: buying without a customer account · needs a decision (confirmed not in launch policy; UI prototype follows sign in required checkout)
+- **Confirmed commerce policy values**: replace mock delivery charges and align payout and return rules once those policies are approved · from spec 0010
 - **Backorders and preorders**: selling items before stock is available · needs a decision
 
 ## Legend

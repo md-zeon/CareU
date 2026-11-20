@@ -95,6 +95,10 @@ export function BrowseProductCard({
             </div>
           ) : null}
           <BrowseQuickActions
+            productId={card.productId}
+            variantId={card.variantId ?? null}
+            shopId={card.shopId}
+            disabled={card.availability === "out_of_stock"}
             wishlistLabel={labels.wishlist}
             cartLabel={labels.cart}
             wishlistAddedLabel={labels.wishlistAdded}

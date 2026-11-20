@@ -22,7 +22,7 @@ export function ListItem({ children, className }: { children: ReactNode; classNa
 }
 
 export function DetailShell({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cn("grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(280px,1fr)]", className)}>{children}</div>;
+  return <div className={cn("grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(280px,1fr)]", className)}>{children}</div>;
 }
 
 export function Stack({ children, className }: { children: ReactNode; className?: string }) {

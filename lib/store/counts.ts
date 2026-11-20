@@ -1,16 +1,15 @@
 "use client";
 
-/**
- * Placeholder badge counts for the header.
- *
- * TODO(cart): replace the return values with Zustand selectors once the
- * cart/wishlist stores exist. Keeping the hooks now means the header badge
- * components never need to change when real data lands.
- */
+/** Header badge counts backed by the shared browser cart/wishlist store. */
+
+import { useSharedStore } from "./shared/hooks";
+
 export function useCartCount(): number {
-  return 0;
+  return useSharedStore((state) =>
+    state.activeCartLines.reduce((total, line) => total + line.quantity, 0),
+  );
 }
 
 export function useWishlistCount(): number {
-  return 0;
+  return useSharedStore((state) => state.wishlistLines.length);
 }

@@ -69,6 +69,7 @@ export async function ProductDetailView({
           </div>
           <ProductPurchasePanel
             locale={locale}
+            productId={product.id}
             variants={data.variants}
             selectedVariantId={selectedVariant?.id ?? data.selectedVariantId}
             shop={data.shop}

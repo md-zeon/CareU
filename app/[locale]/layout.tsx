@@ -10,6 +10,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { routing } from "@/lib/i18n/routing";
 import { PrototypeSessionProvider } from "@/lib/prototype/session";
+import { SharedPrototypeStoreProvider } from "@/lib/store/shared/provider";
 import { PrototypeChrome } from "@/components/prototype/PrototypeChrome";
 
 const inter = Inter({
@@ -54,9 +55,15 @@ export default async function LocaleLayout({ children }: LocaleLayoutProps) {
 
   const messages = (await import(`@/lib/i18n/messages/${locale}.json`)).default as AbstractIntlMessages & {
     PrototypeAccess?: AbstractIntlMessages;
+    Cart?: AbstractIntlMessages;
+    Wishlist?: AbstractIntlMessages;
+    Checkout?: AbstractIntlMessages;
   };
-  const prototypeMessages = {
+  const clientMessages = {
     PrototypeAccess: messages.PrototypeAccess ?? {},
+    Cart: messages.Cart ?? {},
+    Wishlist: messages.Wishlist ?? {},
+    Checkout: messages.Checkout ?? {},
   };
 
   return (
@@ -65,10 +72,12 @@ export default async function LocaleLayout({ children }: LocaleLayoutProps) {
       className={`${inter.variable} ${hindSiliguri.variable}`}
     >
       <body>
-        <NextIntlClientProvider locale={locale} messages={prototypeMessages}>
+        <NextIntlClientProvider locale={locale} messages={clientMessages}>
           <PrototypeSessionProvider>
-            {children}
-            <PrototypeChrome />
+            <SharedPrototypeStoreProvider>
+              {children}
+              <PrototypeChrome />
+            </SharedPrototypeStoreProvider>
           </PrototypeSessionProvider>
         </NextIntlClientProvider>
       </body>
