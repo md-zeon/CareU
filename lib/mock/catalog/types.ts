@@ -29,6 +29,9 @@ export type MockProduct = {
   rating?: number;
   reviewCount?: number;
   status: "active" | "draft" | "archived";
+  highlights?: LocalizedText[];
+  specifications?: { label: LocalizedText; value: LocalizedText }[];
+  frequentlyBoughtTogetherProductIds?: string[];
 };
 
 export type MockProductVariant = {

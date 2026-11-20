@@ -1,87 +1,96 @@
+import Link from "next/link";
+import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
-import { PageContainer, PageHeader, Section, CardShell, CardContent } from "@/components/storefront/primitives";
-import { EmptyState } from "@/components/storefront/states";
-import { formatPrice } from "@/lib/catalog/price";
-import { mockProducts, mockVariants } from "@/lib/mock/catalog";
-import { findBySlug, l } from "@/lib/mock/types";
-import { mockShops } from "@/lib/mock/shops";
+import { getProductDetailPageResult, mockProducts } from "@/lib/mock";
 import type { Locale } from "@/lib/i18n/routing";
+import { PageContainer, PageHeader } from "@/components/storefront/primitives";
+import { EmptyState, ErrorState, LoadingState } from "@/components/storefront/states";
+import { buttonVariants } from "@/components/ui/button";
+import { withLocale } from "@/components/storefront/home/home-utils";
+import { ProductDetailView } from "@/components/storefront/product/ProductDetailView";
 
 export const instant = false;
 
-function pick(text: { en: string; bn: string }, locale: Locale) {
-  return locale === "bn" ? text.bn : text.en;
-}
-
 export function generateStaticParams() {
-  return mockProducts.map((product) => ({ slug: product.slug }));
+  return mockProducts.filter((p) => p.status !== "archived").map((product) => ({ slug: product.slug }));
 }
 
-export default async function ProductPlaceholderPage({
+export async function generateMetadata({
   params,
 }: {
   params: Promise<{ locale: string; slug: string }>;
-}) {
+}): Promise<Metadata> {
   const { slug } = await params;
   const locale = (await getLocale()) as Locale;
-  const placeholder = await getTranslations("Placeholder");
-  const product = findBySlug(mockProducts, slug);
-
+  const product = mockProducts.find((p) => p.slug === slug);
   if (!product) {
+    return {
+      robots: { index: false, follow: true },
+    };
+  }
+  const title = locale === "bn" ? product.title.bn : product.title.en;
+  const description = locale === "bn" ? product.description.bn : product.description.en;
+  return {
+    title,
+    description,
+    robots: { index: true, follow: true },
+  };
+}
+
+export default async function ProductPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string; slug: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const { slug } = await params;
+  const sp = await searchParams;
+  const locale = (await getLocale()) as Locale;
+  const t = await getTranslations("Product");
+
+  const result = getProductDetailPageResult(slug, sp);
+  const browseHref = withLocale(locale, "/search");
+
+  if (result.scenario === "loading") {
     return (
       <PageContainer className="space-y-6 py-10 sm:py-14">
-        <PageHeader
-          title={pick(l("Product not found in prototype", "প্রোটোটাইপে পণ্য পাওয়া যায়নি"), locale)}
-          description={placeholder("message")}
-        />
+        <PageHeader title={t("loadingTitle")} description={t("prototypeNote")} />
+        <LoadingState title={t("loadingTitle")} message={t("loadingMessage")} rows={8} />
+      </PageContainer>
+    );
+  }
+
+  if (result.scenario === "error") {
+    const msg = locale === "bn" ? result.message.bn : result.message.en;
+    return (
+      <PageContainer className="space-y-6 py-10 sm:py-14">
+        <PageHeader title={t("errorTitle")} description={t("prototypeNote")} />
+        <ErrorState title={t("errorTitle")} message={msg || t("errorMessage")} />
+        <Link href={browseHref} className={buttonVariants({ variant: "outline" })}>
+          {t("backToBrowse")}
+        </Link>
+      </PageContainer>
+    );
+  }
+
+  const data = result.data;
+  if (!data || data.notFound || !data.product) {
+    return (
+      <PageContainer className="space-y-6 py-10 sm:py-14">
+        <PageHeader title={t("notFoundTitle")} description={t("prototypeNote")} />
         <EmptyState
-          title={pick(l("Unknown product", "অজানা পণ্য"), locale)}
-          message={pick(l("This prototype link points to a product that is not in the mock data yet.", "এই প্রোটোটাইপ লিংকটি এমন একটি পণ্যের দিকে যায় যা এখনো মক ডাটায় নেই।"), locale)}
+          title={t("notFoundTitle")}
+          message={t("notFoundMessage")}
+          action={
+            <Link href={browseHref} className={buttonVariants({ variant: "default" })}>
+              {t("backToBrowse")}
+            </Link>
+          }
         />
       </PageContainer>
     );
   }
 
-  const variant = mockVariants.find((v) => v.productId === product.id);
-  const shop = product.primaryShopId ? mockShops.find((s) => s.id === product.primaryShopId) : undefined;
-
-  return (
-    <PageContainer className="space-y-8 py-10 sm:py-14">
-      <PageHeader
-        eyebrow={pick(l("Prototype product", "প্রোটোটাইপ পণ্য"), locale)}
-        title={pick(product.title, locale)}
-        description={pick(product.description, locale)}
-      />
-      <Section title={pick(l("Product preview", "পণ্যের প্রিভিউ"), locale)}>
-        <CardShell>
-          <CardContent className="space-y-3 text-sm sm:text-base">
-            {variant ? (
-              <p>
-                <span className="font-medium">{pick(l("Price", "মূল্য"), locale)}:</span>{" "}
-                {formatPrice(BigInt(variant.priceBdt), locale)}
-              </p>
-            ) : null}
-            {shop ? (
-              <p>
-                <span className="font-medium">{pick(l("Shop", "দোকান"), locale)}:</span> {pick(shop.name, locale)} (
-                {shop.type === "careu"
-                  ? pick(l("CareU shop", "কেয়ারইউ দোকান"), locale)
-                  : pick(l("Marketplace seller", "মার্কেটপ্লেস বিক্রেতা"), locale)}
-                )
-              </p>
-            ) : null}
-            <p className="text-muted-foreground">
-              {pick(
-                l("Full product details, gallery, variants, reviews, and related items will be added in the customer product journey.", "সম্পূর্ণ পণ্যের বিবরণ, গ্যালারি, ভ্যারিয়েন্ট, রিভিউ এবং সম্পর্কিত পণ্য কাস্টমার প্রোডাক্ট জার্নিতে যোগ করা হবে।"),
-                locale,
-              )}
-            </p>
-          </CardContent>
-        </CardShell>
-      </Section>
-      <p className="text-xs text-muted-foreground">
-        {pick(l("Prototype placeholder: mock data only, no real product, cart, or stock behavior.", "প্রোটোটাইপ প্লেসহোল্ডার: শুধু মক ডাটা, কোনো প্রকৃত পণ্য, কার্ট বা স্টক আচরণ নেই।"), locale)}
-      </p>
-    </PageContainer>
-  );
+  return <ProductDetailView locale={locale} data={data} />;
 }

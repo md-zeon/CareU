@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getLocale } from "next-intl/server";
 import type { Locale } from "@/lib/i18n/routing";
+import type { MockScenario } from "@/lib/mock";
 import { getSearchBrowseResult } from "@/lib/mock/browse";
 import { BrowseView } from "@/components/storefront/browse/BrowseView";
 
@@ -17,7 +18,11 @@ export default async function SearchPage({
 }) {
   const sp = await searchParams;
   const locale = (await getLocale()) as Locale;
-  const scenario = (typeof sp.scenario === "string" ? sp.scenario : undefined) as any;
+  const scenario: MockScenario | undefined =
+    typeof sp.scenario === "string" &&
+    (sp.scenario === "default" || sp.scenario === "empty" || sp.scenario === "loading" || sp.scenario === "error" || sp.scenario === "success")
+      ? sp.scenario
+      : undefined;
   const query = new URLSearchParams();
   for (const [k, v] of Object.entries(sp)) {
     if (k === "scenario") continue;

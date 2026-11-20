@@ -9,3 +9,4 @@ export * from "./seller";
 export * from "./platform";
 export * from "./home";
 export * from "./browse";
+export * from "./pdp";

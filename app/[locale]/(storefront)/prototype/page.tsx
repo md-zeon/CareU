@@ -32,6 +32,7 @@ import {
   getMockPersonas,
   getMockProducts,
   getMockShops,
+  getProductDetailPageResult,
   getSearchBrowseResult,
   type MockScenario,
 } from "@/lib/mock";
@@ -99,6 +100,11 @@ export default async function PrototypeShowcasePage() {
   const browseSearch = getSearchBrowseResult(new URLSearchParams("q=phone"), { scenario: "default" });
   const browseSearchEmpty = getSearchBrowseResult(new URLSearchParams("q=zzzz-not-found"), { scenario: "default" });
   const browseCollections = getMockCollections({ scenario: "default" }).data ?? [];
+
+  const pdpDefault = getProductDetailPageResult("vivo-y28-5g", {});
+  const pdpLoading = getProductDetailPageResult("vivo-y28-5g", { scenario: "loading" });
+  const pdpEmpty = getProductDetailPageResult("vivo-y28-5g", { scenario: "empty" });
+  const pdpError = getProductDetailPageResult("vivo-y28-5g", { scenario: "error" });
 
   return (
     <PageContainer className="space-y-10 py-10 sm:py-14">
@@ -269,6 +275,35 @@ export default async function PrototypeShowcasePage() {
           </CardShell>
         </div>
         <p className="text-xs text-muted-foreground">Browse journey uses mock data only: URL based filters/sort/pagination, UI only wishlist/cart quick actions, and no real backend, auth, payment, or stock writes.</p>
+      </Section>
+
+      <Section id="product-review-journey" title="Customer product and review journey" description="Feature 8 preview: product detail page with gallery, variants, shop context, details/specs, reviews, cross sell, and prototype states on mock data.">
+        <div className="grid gap-4 lg:grid-cols-2">
+          <CardShell>
+            <CardHeader><h3 className="font-semibold">Resolved PDP scenarios</h3></CardHeader>
+            <CardContent className="space-y-2 text-sm">
+              <p><span className="font-medium">Default:</span> {pdpDefault.scenario === "default" && pdpDefault.data?.product ? pdpDefault.data.product.title.en : "n/a"}</p>
+              <p><span className="font-medium">Loading:</span> {pdpLoading.scenario === "loading" ? "loading state" : "n/a"}</p>
+              <p><span className="font-medium">Empty (reviews/cross sell cleared):</span> {pdpEmpty.scenario === "empty" && pdpEmpty.data ? `${pdpEmpty.data.reviews.length} reviews` : "n/a"}</p>
+              <p><span className="font-medium">Error:</span> {pdpError.scenario === "error" ? pdpError.message.en : "n/a"}</p>
+            </CardContent>
+          </CardShell>
+          <CardShell>
+            <CardHeader><h3 className="font-semibold">Try prototype routes</h3></CardHeader>
+            <CardContent className="space-y-2 text-sm">
+              <ul className="list-disc space-y-1 pl-5 text-muted-foreground">
+                <li><a className="text-foreground underline underline-offset-4" href={`/${locale}/product/vivo-y28-5g`}>/product/vivo-y28-5g</a></li>
+                <li><a className="text-foreground underline underline-offset-4" href={`/${locale}/product/vivo-y28-5g?variant=var-vivo-y28-256`}>/product/vivo-y28-5g?variant=var-vivo-y28-256</a></li>
+                <li><a className="text-foreground underline underline-offset-4" href={`/${locale}/product/mens-cotton-shirt`}>/product/mens-cotton-shirt (variant availability states)</a></li>
+                <li><a className="text-foreground underline underline-offset-4" href={`/${locale}/product/unknown-product`}>/product/unknown-product (not found)</a></li>
+                <li><a className="text-foreground underline underline-offset-4" href={`/${locale}/product/vivo-y28-5g?scenario=loading`}>/product/vivo-y28-5g?scenario=loading</a></li>
+                <li><a className="text-foreground underline underline-offset-4" href={`/${locale}/product/vivo-y28-5g?scenario=empty`}>/product/vivo-y28-5g?scenario=empty</a></li>
+                <li><a className="text-foreground underline underline-offset-4" href={`/${locale}/product/vivo-y28-5g?scenario=error`}>/product/vivo-y28-5g?scenario=error</a></li>
+              </ul>
+            </CardContent>
+          </CardShell>
+        </div>
+        <p className="text-xs text-muted-foreground">Product journey uses mock data only: URL based variant selection, UI only cart/wishlist and gated review entry, recently viewed prototype behavior with fallback, and no real backend, auth, review submission, payment, checkout, or stock writes.</p>
       </Section>
 
       <Section id="mock-coverage" title={t("mockTitle")} description={t("mockDescription")}>

@@ -265,14 +265,7 @@ export function BrowseControls({
   );
 }
 
-export function BrowseFiltersSidebar({
-  locale,
-  facets,
-  activeSort,
-  sortOptions,
-  labels,
-  totalCount,
-}: {
+export function BrowseFiltersSidebar(_props: {
   locale: Locale;
   facets: FacetDefinition[];
   sortOptions: { key: BrowseSortKey; label: { en: string; bn: string } }[];
@@ -280,6 +273,7 @@ export function BrowseFiltersSidebar({
   labels: Labels;
   totalCount: number;
 }) {
+  void _props;
   // Sidebar renders the same controls panel on desktop via BrowseControls? We'll use BrowseControls for chips/sort/mobile and duplicate panel for desktop.
   // To keep simple, provide a desktop-only wrapper in page using a separate panel component would be better, but for now this is unused.
   return null;

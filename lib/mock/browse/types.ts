@@ -1,5 +1,4 @@
 import type { LocalizedText } from "../types";
-import type { MockBrand, MockCategory } from "../catalog/types";
 import type { MockShop } from "../shops/types";
 
 export type MockCollection = {

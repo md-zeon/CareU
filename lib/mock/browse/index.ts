@@ -384,7 +384,8 @@ function paginate<T>(items: T[], page: number, pageSize: number) {
   };
 }
 
-function buildAttributeFacets(cards: ResolvedProductCard[], state: BrowseQueryState): FacetDefinition[] {
+function buildAttributeFacets(cards: ResolvedProductCard[], _state: BrowseQueryState): FacetDefinition[] {
+  void _state;
   const valueSets = new Map<string, Map<string, number>>();
   for (const card of cards) {
     for (const pair of getAttributePairs(card)) {
@@ -657,8 +658,12 @@ export function getSearchBrowseResult(
   const all = resolveAllProductCards();
   const matched = all.filter((card) => {
     const cat = getCategoryById(card.categoryId);
-    const brand = card.brandId ? mockBrands.find((b) => b.id === card.brandId) : undefined;
-    const collectionMatch = mockCollections.some((col) => col.visible && col.productIds.includes(card.productId) && (matchesLocalizedQuery(col.title, q) || matchesLocalizedQuery(col.description, q)));
+    const collectionMatch = mockCollections.some(
+      (col) =>
+        col.visible &&
+        col.productIds.includes(card.productId) &&
+        (matchesLocalizedQuery(col.title, q) || matchesLocalizedQuery(col.description, q)),
+    );
     return (
       matchesLocalizedQuery(card.title, q) ||
       (card.brandLabel && matchesLocalizedQuery(card.brandLabel, q)) ||

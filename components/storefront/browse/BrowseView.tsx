@@ -3,7 +3,7 @@ import type { Locale } from "@/lib/i18n/routing";
 import type { BrowsePageResult } from "@/lib/mock/browse";
 import { getSortOptions } from "@/lib/mock/browse";
 import { getTranslations } from "next-intl/server";
-import { PageContainer, PageHeader, Section } from "@/components/storefront/primitives";
+import { PageContainer, PageHeader } from "@/components/storefront/primitives";
 import { EmptyState, ErrorState } from "@/components/storefront/states";
 import { pickText, withLocale } from "@/components/storefront/home/home-utils";
 import { BrowseBreadcrumbs } from "./BrowseBreadcrumbs";

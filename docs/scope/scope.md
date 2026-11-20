@@ -24,7 +24,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 5 | Prototype access and journey switcher | UI foundations | done |
 | 6 | Customer home and discovery journey | Phase 1 · Customer journeys | done |
 | 7 | Customer browse, search, and brand journey | Phase 1 · Customer journeys | done |
-| 8 | Customer product and review journey | Phase 1 · Customer journeys | planned |
+| 8 | Customer product and review journey | Phase 1 · Customer journeys | done |
 | 9 | Customer cart and wishlist journey | Phase 1 · Customer journeys | planned |
 | 10 | Customer checkout and order confirmation journey | Phase 1 · Customer journeys | planned |
 | 11 | Customer account, addresses, orders, and tracking journey | Phase 1 · Customer journeys | planned |
@@ -171,10 +171,17 @@ spec [0007](../specs/0007-customer-browse-search-brand-journey/index.md) · code
   - [x] Milestone 3: add header search autocomplete and clickable UI only wishlist/cart quick action feedback with local client state, satisfies **AC-4**, **AC-5**, **AC-7**
   - [x] Milestone 4: add prototype showcase/state preview coverage and complete responsive, accessibility, fallback, and boundary checks across all browse surfaces, satisfies **AC-1**, **AC-2**, **AC-3**, **AC-4**, **AC-5**, **AC-6**, **AC-7**
 
-### 8. Customer product and review journey · needs a decision
+### 8. Customer product and review journey · done
 Prototype product detail pages with galleries, variant selection, price and availability display, seller or shop context, related products, and review presentation on mock data, including future facing space for supported experiences.
 **Done when:** a customer can view a product, switch variants, understand availability and shop context, see review and related item states, and continue to cart or wishlist flows.
-- [ ] Design it (spec): `/architect customer product and review journey`
+spec [0008](../specs/0008-customer-product-and-review-journey/index.md) · code in `lib/mock/pdp/`, `components/storefront/product/`, `app/[locale]/(storefront)/product/[slug]/page.tsx`, `app/[locale]/(storefront)/prototype/page.tsx`, `lib/mock/catalog/`, `lib/mock/trust/`, `lib/mock/index.ts`, `lib/i18n/messages/en.json`, `lib/i18n/messages/bn.json`
+- [x] Design it (spec): `/architect customer product and review journey`
+- [x] Build it: `/develop customer product and review journey`
+  - [x] Milestone 1: add PDP mock contracts, fixtures, and safe catalog/trust/identity extensions (including highlights, specifications, and frequently bought together mappings), satisfies **AC-1**, **AC-2**, **AC-3**, **AC-4**, **AC-5**, **AC-6**
+  - [x] Milestone 2: implement deterministic PDP resolvers and URL safe variant selection (breadcrumbs, representative shop context, gallery fallback, review summary/list mapping, cross sell groups, recently viewed fallback data), satisfies **AC-1**, **AC-2**, **AC-3**, **AC-4**, **AC-5**, **AC-6**
+  - [x] Milestone 3: build reusable server first PDP UI sections (purchase block, variant and availability display, details/specs, reviews with gated write review entry, cross sell/related blocks, future experience placeholder), satisfies **AC-1**, **AC-2**, **AC-3**, **AC-4**, **AC-5**, **AC-6**
+  - [x] Milestone 4: compose the product route and wire interactions (server resolved data, variant URL sync, UI only wishlist/cart feedback, recently viewed prototype behavior, navigable placeholder handoff), satisfies **AC-1**, **AC-2**, **AC-3**, **AC-4**, **AC-5**, **AC-6**
+  - [x] Milestone 5: add prototype state/scenario coverage and complete responsive, accessibility, bilingual, integer BDT, fallback, and boundary checks, satisfies **AC-1**, **AC-2**, **AC-3**, **AC-4**, **AC-5**, **AC-6**
 
 ### 9. Customer cart and wishlist journey · needs a decision
 Prototype cart and wishlist screens as complete UI flows with item lists, quantity and selection changes, saved for later style states if useful, and clear empty and error states using browser side or mock data only.
