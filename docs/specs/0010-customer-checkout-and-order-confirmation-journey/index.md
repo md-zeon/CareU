@@ -1,7 +1,7 @@
 # 0010. Customer checkout and order confirmation journey
 
 **Date**: 2026-11-20
-**Status**: Proposed
+**Status**: In Progress
 
 ## Summary
 
@@ -139,15 +139,15 @@ None. The feature uses existing mock modules, prototype state, local placeholder
 
 Build approach: **Facade**. Lead with the visible checkout shell on mock data, then make the draft, totals, failures, and confirmation real behind it. No migration is needed because all state is in the browser.
 
-1. Add `react-hook-form`, `zod`, and `@hookform/resolvers` to `package.json`, and add the checkout and confirmation `next-intl` message namespaces for `en` and `bn`. Satisfies **AC-2**, **AC-15**.
-2. Create `lib/mock/checkout` with typed contracts, fixtures, scenario helpers, the delivery rule table, the deterministic order number generator, the placement helper, and session storage helpers. Add no HTTP routes, Prisma models, or migrations. Satisfies **AC-5**, **AC-7**, **AC-12**, **AC-13**, **AC-15**.
-3. Build the checkout page shell with `PageHeader`, `CardShell`, the existing customer gate, and the four sections in the fixed order address, delivery, payment, summary. Preserve loading and noindex behavior. Satisfies **AC-1**, **AC-2**.
-4. Wire cart selection and product buy now into `createCheckoutDraft`, including the blocking empty and unavailable states, the cart return link, and draft discard on leave. Satisfies **AC-3**, **AC-4**, **AC-14**.
-5. Implement the address section with the saved address picker and the inline address form using `react-hook-form`, `zod`, and localized field errors, with no persistence. Satisfies **AC-6**.
-6. Implement the delivery and payment sections, including the mock rule based charges, the cash on delivery option, the labeled mock online gateway panel, and the no address and payment failure scenario states. Satisfies **AC-7**, **AC-8**, **AC-9**, **AC-10**.
-7. Implement summary totals with `lib/money`, the late availability block, the disabled state during placement, placement failures with retry, and the no side effect guarantee. Satisfies **AC-11**, **AC-12**.
-8. Build the separate confirmation route with the deterministic order number, per shop summary, session storage refresh, no tracking content, and noindex metadata. Satisfies **AC-13**, **AC-2**.
-9. Add prototype switcher coverage for all five required failures plus a consistency pass over bilingual strings, integer BDT, local placeholder assets, responsive layout, and empty, loading, and error states. Satisfies **AC-9**, **AC-2**, **AC-15**.
+1. [x] Add `react-hook-form`, `zod`, and `@hookform/resolvers` to `package.json`, and add the checkout and confirmation `next-intl` message namespaces for `en` and `bn`. Satisfies **AC-2**, **AC-15**.
+2. [x] Create `lib/mock/checkout` with typed contracts, fixtures, scenario helpers, the delivery rule table, the deterministic order number generator, the placement helper, and session storage helpers. Add no HTTP routes, Prisma models, or migrations. Satisfies **AC-5**, **AC-7**, **AC-12**, **AC-13**, **AC-15**.
+3. [x] Build the checkout page shell with `PageHeader`, `CardShell`, the existing customer gate, and the four sections in the fixed order address, delivery, payment, summary. Preserve loading and noindex behavior. Satisfies **AC-1**, **AC-2**.
+4. [x] Wire cart selection and product buy now into `createCheckoutDraft`, including the blocking empty and unavailable states, the cart return link, and draft discard on leave. Satisfies **AC-3**, **AC-4**, **AC-14**.
+5. [x] Implement the address section with the saved address picker and the inline address form using `react-hook-form`, `zod`, and localized field errors, with no persistence. Satisfies **AC-6**.
+6. [x] Implement the delivery and payment sections, including the mock rule based charges, the cash on delivery option, the labeled mock online gateway panel, and the no address and payment failure scenario states. Satisfies **AC-7**, **AC-8**, **AC-9**, **AC-10**.
+7. [x] Implement summary totals with `lib/money`, the late availability block, the disabled state during placement, placement failures with retry, and the no side effect guarantee. Satisfies **AC-11**, **AC-12**.
+8. [x] Build the separate confirmation route with the deterministic order number, per shop summary, session storage refresh, no tracking content, and noindex metadata. Satisfies **AC-13**, **AC-2**.
+9. [x] Add prototype switcher coverage for all five required failures plus a consistency pass over bilingual strings, integer BDT, local placeholder assets, responsive layout, and empty, loading, and error states. Satisfies **AC-9**, **AC-2**, **AC-15**.
 
 ## Consequences
 

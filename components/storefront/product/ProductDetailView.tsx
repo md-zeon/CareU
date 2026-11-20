@@ -84,6 +84,8 @@ export async function ProductDetailView({
               shopLabel: t("shopLabel"),
               addToCart: t("addToCart"),
               addedToCart: t("addedToCart"),
+              buyNow: t("buyNow"),
+              buyNowHint: t("buyNowHint"),
               addToWishlist: t("addToWishlist"),
               addedToWishlist: t("addedToWishlist"),
               proceedToCheckout: t("proceedToCheckout"),

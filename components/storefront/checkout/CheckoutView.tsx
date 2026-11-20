@@ -1,118 +1,289 @@
 "use client";
 
-import { useMemo } from "react";
-import Image from "next/image";
+import { useCallback, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { ShoppingBagIcon } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { formatPrice } from "@/lib/catalog/price";
+import { buttonVariants } from "@/components/ui/button";
 import type { Locale } from "@/lib/i18n/routing";
-import { groupCartLines, resolveLines, summarizeCart } from "@/lib/store/shared/resolve";
-import { useSharedStore, useSharedStoreHydrated } from "@/lib/store/shared/hooks";
-import { CardContent, CardHeader, CardShell, DetailShell, PageHeader } from "@/components/storefront/primitives";
+import {
+  clearBuyNowDraft,
+  createCheckoutDraft,
+  districtKeyFor,
+  getDeliveryOptions,
+  getPaymentMethods,
+  getSavedAddresses,
+  hasUnavailableItem,
+  placeMockOrder,
+  readBuyNowDraft,
+  recomputeTotals,
+  saveLastConfirmation,
+  toCheckoutItemSnapshot,
+  type CheckoutDraft,
+  type CheckoutFailure,
+  type CheckoutScenario,
+  type DraftResult,
+} from "@/lib/mock/checkout";
+import { resolveLine, resolveLines } from "@/lib/store/shared/resolve";
+import { useSharedStoreContext, useSharedStoreHydrated } from "@/lib/store/shared/provider";
+import { DetailShell, PageContainer, PageHeader } from "@/components/storefront/primitives";
 import { EmptyState, LoadingState } from "@/components/storefront/states";
-import { pickText, withLocale } from "@/components/storefront/home/home-utils";
+import { withLocale } from "@/components/storefront/home/home-utils";
+import { AddressSection } from "./AddressSection";
+import { DeliverySection } from "./DeliverySection";
+import { PaymentSection } from "./PaymentSection";
+import { CheckoutSummary } from "./CheckoutSummary";
 
-export function CheckoutView({ locale }: { locale: Locale }) {
+type CheckoutOverrides = Partial<Pick<CheckoutDraft, "addressSelection" | "deliveryOptionId" | "paymentMethodId">>;
+
+/** Client checkout shell. The draft is local state and never writes to the cart. */
+export function CheckoutView({ locale, scenario }: { locale: Locale; scenario: CheckoutScenario }) {
   const t = useTranslations("Checkout");
+  const router = useRouter();
   const hydrated = useSharedStoreHydrated();
-  const checkoutLineIds = useSharedStore((state) => state.checkoutLineIds);
-  const activeLines = useSharedStore((state) => state.activeCartLines);
+  const { store } = useSharedStoreContext();
 
-  const selectedLines = useMemo(() => {
-    if (checkoutLineIds.length === 0) {
-      return activeLines.filter((line) => line.selected);
+  const [overrideState, setOverrideState] = useState<{ key: string; value: CheckoutOverrides }>({ key: "", value: {} });
+  const [placementState, setPlacementState] = useState<{ key: string; failure: CheckoutFailure | null }>({
+    key: "",
+    failure: null,
+  });
+  const [placing, setPlacing] = useState(false);
+  const currentKey = `${hydrated ? "hydrated" : "pending"}:${scenario}`;
+
+  // Snapshot once per hydration and scenario. Later cart changes do not redraft checkout.
+  const baseResult = useMemo<DraftResult | null>(() => {
+    if (!hydrated) return null;
+
+    const state = store.getState();
+    const handoff = readBuyNowDraft();
+    // A fresh buy now handoff wins over an older cart selection. Cart entry
+    // clears the handoff before navigating here.
+    const fromCart = scenario === "empty_selection" || !handoff;
+
+    if (fromCart) {
+      const allowed = new Set(state.checkoutLineIds);
+      const chosen =
+        allowed.size > 0
+          ? state.activeCartLines.filter((line) => allowed.has(line.lineId))
+          : state.activeCartLines.filter((line) => line.selected);
+      const lines = resolveLines(chosen)
+        .filter((line) => line.isAvailable)
+        .map((line) => toCheckoutItemSnapshot(line));
+      return createCheckoutDraft({ source: "cart", lines, scenario });
     }
-    const allowed = new Set(checkoutLineIds);
-    return activeLines.filter((line) => allowed.has(line.lineId));
-  }, [activeLines, checkoutLineIds]);
 
-  const resolved = useMemo(() => resolveLines(selectedLines), [selectedLines]);
-  const groups = useMemo(() => groupCartLines(resolved.filter((line) => line.isAvailable)), [resolved]);
-  const summary = useMemo(() => summarizeCart(resolved.filter((line) => line.isAvailable)), [resolved]);
+    if (handoff) {
+      const resolved = resolveLine({
+        lineId: "buy-now",
+        productId: handoff.productId,
+        variantId: handoff.variantId,
+        shopId: handoff.shopId,
+        quantity: handoff.quantity,
+        selected: true,
+        addedAt: "",
+      });
+      return createCheckoutDraft({
+        source: "buy_now",
+        handoff,
+        resolved: toCheckoutItemSnapshot(resolved, { lineId: null }),
+        scenario,
+      });
+    }
 
+    return createCheckoutDraft({ source: "cart", lines: [], scenario });
+  }, [hydrated, scenario, store]);
+
+  const overrides = useMemo(
+    () => (overrideState.key === currentKey ? overrideState.value : {}),
+    [overrideState, currentKey],
+  );
+  const draft = useMemo(
+    () => (baseResult?.ok ? { ...baseResult.draft, ...overrides } : null),
+    [baseResult, overrides],
+  );
+  const blockedFailure = baseResult && !baseResult.ok ? baseResult.failure : null;
+  const placementFailure = placementState.key === currentKey ? placementState.failure : null;
+
+  const updateOverrides = useCallback(
+    (patch: CheckoutOverrides) => {
+      setOverrideState((current) => ({
+        key: currentKey,
+        value: current.key === currentKey ? { ...current.value, ...patch } : patch,
+      }));
+    },
+    [currentKey],
+  );
+
+  const setPlacementFailure = useCallback(
+    (failure: CheckoutFailure | null) => {
+      setPlacementState({ key: currentKey, failure });
+    },
+    [currentKey],
+  );
+
+  const savedAddresses = useMemo(() => getSavedAddresses(scenario, locale), [scenario, locale]);
+  const paymentMethods = useMemo(() => getPaymentMethods(), []);
+
+  const destinationDistrictKey = useMemo(() => {
+    const selection = draft?.addressSelection;
+    if (!selection) return "other";
+    if (selection.kind === "saved") return selection.address.districtKey;
+    return districtKeyFor(selection.address.district);
+  }, [draft?.addressSelection]);
+
+  const deliveryOptions = useMemo(() => getDeliveryOptions(destinationDistrictKey), [destinationDistrictKey]);
+  const selectedDelivery = deliveryOptions.find((option) => option.id === draft?.deliveryOptionId) ?? deliveryOptions[0];
+  const selectedPayment = paymentMethods.find((method) => method.id === draft?.paymentMethodId) ?? paymentMethods[0];
+
+  const totalsResult = useMemo(
+    () => (draft ? recomputeTotals(draft, selectedDelivery.chargePoisha) : null),
+    [draft, selectedDelivery.chargePoisha],
+  );
+
+  const unavailable = draft ? hasUnavailableItem(draft) : false;
+
+  const messageFor = useCallback((key: string) => t(key as Parameters<typeof t>[0]), [t]);
+
+  const placeOrder = useCallback(async () => {
+    if (!draft || !draft.addressSelection || placing || unavailable || !totalsResult?.ok) return;
+    setPlacing(true);
+    setPlacementFailure(null);
+
+    const result = await placeMockOrder({
+      draft,
+      addressSelection: draft.addressSelection,
+      deliveryOption: selectedDelivery,
+      paymentMethod: selectedPayment,
+      scenario,
+      locale,
+    });
+
+    setPlacing(false);
+    if (!result.ok) {
+      setPlacementFailure(result.failure);
+      return;
+    }
+
+    saveLastConfirmation(result.confirmation);
+    clearBuyNowDraft();
+    router.push(withLocale(locale, "/order/confirmation"));
+  }, [draft, locale, placing, router, scenario, selectedDelivery, selectedPayment, setPlacementFailure, totalsResult?.ok, unavailable]);
+
+  const paymentFailure =
+    placementFailure?.stage === "payment"
+      ? {
+          title: t("paymentFailureTitle"),
+          message: messageFor(placementFailure.messageKey),
+          retryLabel: t("retryPayment"),
+        }
+      : null;
+  const reviewFailure =
+    placementFailure?.stage === "placement"
+      ? {
+          title: t("placementFailureTitle"),
+          message: messageFor(placementFailure.messageKey),
+          retryLabel: t("retryPlacement"),
+        }
+      : null;
+
+  const steps = [t("stepAddress"), t("stepDelivery"), t("stepPayment"), t("stepReview")];
+  const browseLink = (
+    <Link href={withLocale(locale, "/search")} className={buttonVariants({ variant: "outline" })}>
+      {t("browseAction")}
+    </Link>
+  );
   const cartLink = (
-    <Link
-      href={withLocale(locale, "/cart")}
-      className="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-4 text-sm font-medium hover:bg-accent"
-    >
+    <Link href={withLocale(locale, "/cart")} className={buttonVariants()}>
       {t("backToCart")}
     </Link>
   );
 
   if (!hydrated) {
-    return <LoadingState title={t("title")} message={t("description")} rows={4} />;
+    return (
+      <PageContainer className="py-8 sm:py-10">
+        <PageHeader eyebrow={t("eyebrow")} title={t("title")} description={t("description")} />
+        <LoadingState title={t("title")} message={t("description")} rows={5} />
+      </PageContainer>
+    );
   }
 
-  if (groups.length === 0) {
+  if (!draft || !totalsResult?.ok) {
     return (
-      <div className="space-y-6">
-        <PageHeader title={t("title")} description={t("description")} />
+      <PageContainer className="space-y-6 py-8 sm:py-10">
+        <PageHeader eyebrow={t("eyebrow")} title={t("title")} description={t("description")} />
         <EmptyState
           title={t("emptyTitle")}
-          message={t("emptyMessage")}
+          message={blockedFailure ? messageFor(blockedFailure.messageKey) : t("emptyMessage")}
           icon={<ShoppingBagIcon className="size-5" />}
-          action={cartLink}
+          action={
+            <div className="flex flex-wrap gap-2">
+              {cartLink}
+              {browseLink}
+            </div>
+          }
         />
-      </div>
+      </PageContainer>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <PageHeader title={t("title")} description={t("description")} />
+    <PageContainer className="space-y-6 py-8 sm:py-10">
+      <PageHeader eyebrow={t("eyebrow")} title={t("title")} description={t("description")} />
+
+      <ol className="flex flex-wrap gap-2" aria-label={t("title")}>
+        {steps.map((label, index) => (
+          <li
+            key={label}
+            className="inline-flex items-center gap-2 rounded-full border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground"
+          >
+            <span className="flex size-5 items-center justify-center rounded-full bg-primary/10 text-primary">{index + 1}</span>
+            {label}
+          </li>
+        ))}
+      </ol>
+
       <DetailShell>
         <div className="space-y-4">
-          {groups.map((group) => (
-            <CardShell key={group.shopId} className="overflow-hidden">
-              <CardHeader className="flex flex-wrap items-center justify-between gap-2">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-sm font-semibold">{pickText(group.shopName, locale)}</span>
-                  <Badge variant={group.shopType === "careu" ? "default" : "secondary"}>
-                    {group.shopType === "careu" ? t("careuShop") : t("marketplaceSeller")}
-                  </Badge>
-                </div>
-                <span className="text-xs text-muted-foreground">{t("shopLabel")}</span>
-              </CardHeader>
-              <div className="divide-y">
-                {group.lines.map((line) => (
-                  <div key={line.lineId} className="flex items-center gap-3 px-4 py-3 sm:px-5">
-                    <div className="relative size-14 shrink-0 overflow-hidden rounded-lg bg-muted">
-                      <Image src={line.image} alt={pickText(line.title, locale)} fill sizes="56px" className="object-cover" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium">{pickText(line.title, locale)}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {line.variantTitle ? `${pickText(line.variantTitle, locale)} · ` : ""}
-                        {t("quantityLabel")}: {line.quantity}
-                      </p>
-                    </div>
-                    <p className="shrink-0 text-sm font-semibold">{formatPrice(BigInt(line.lineTotalBdt), locale)}</p>
-                  </div>
-                ))}
-              </div>
-            </CardShell>
-          ))}
+          <AddressSection
+            addresses={savedAddresses}
+            selection={draft.addressSelection}
+            onSelect={(selection) => updateOverrides({ addressSelection: selection })}
+          />
+          <DeliverySection
+            locale={locale}
+            options={deliveryOptions}
+            selectedId={selectedDelivery.id}
+            onSelect={(optionId) => updateOverrides({ deliveryOptionId: optionId })}
+          />
+          <PaymentSection
+            locale={locale}
+            methods={paymentMethods}
+            selectedId={selectedPayment.id}
+            onSelect={(methodId) => updateOverrides({ paymentMethodId: methodId })}
+            failure={paymentFailure}
+            onRetry={placeOrder}
+          />
         </div>
+
         <div className="lg:sticky lg:top-6 lg:self-start">
-          <CardShell>
-            <CardHeader>
-              <h2 className="text-base font-semibold">{t("summaryTitle")}</h2>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm">
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-muted-foreground">{t("subtotal")}</span>
-                <span className="font-semibold">{formatPrice(summary.subtotalBdt, locale)}</span>
-              </div>
-              <p className="text-xs text-muted-foreground">{t("deliveryNote")}</p>
-              <p className="rounded-lg bg-muted p-3 text-xs text-muted-foreground">{t("placeOrderNote")}</p>
-              {cartLink}
-              <p className="text-xs text-muted-foreground">{t("prototypeNote")}</p>
-            </CardContent>
-          </CardShell>
+          <CheckoutSummary
+            locale={locale}
+            totals={totalsResult.totals}
+            deliveryOption={selectedDelivery}
+            paymentMethod={selectedPayment}
+            addressSelection={draft.addressSelection}
+            unavailable={unavailable}
+            placing={placing}
+            placementFailure={reviewFailure}
+            onPlaceOrder={placeOrder}
+            onRetryPlacement={placeOrder}
+          />
         </div>
       </DetailShell>
-    </div>
+
+      <p className="text-xs leading-5 text-muted-foreground">{t("prototypeNote")}</p>
+    </PageContainer>
   );
 }

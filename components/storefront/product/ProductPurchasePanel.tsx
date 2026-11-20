@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/catalog/price";
 import type { Locale } from "@/lib/i18n/routing";
+import { clearBuyNowDraft, saveBuyNowDraft } from "@/lib/mock/checkout";
 import type { ResolvedShopContext, ResolvedVariant } from "@/lib/mock/pdp";
 import { useWishlistActionGate } from "@/lib/prototype/useWishlistActionGate";
 import { getShopIdForProduct } from "@/lib/store/shared/resolve";
@@ -26,6 +27,8 @@ type Labels = {
   shopLabel: string;
   addToCart: string;
   addedToCart: string;
+  buyNow: string;
+  buyNowHint: string;
   addToWishlist: string;
   addedToWishlist: string;
   proceedToCheckout: string;
@@ -77,6 +80,11 @@ export function ProductPurchasePanel({
   function flash(text: string) {
     setMsg(text);
     window.setTimeout(() => setMsg((m) => (m === text ? null : m)), 1800);
+  }
+
+  function buyNow() {
+    saveBuyNowDraft({ productId, variantId, shopId, quantity: 1 });
+    router.push(withLocale(locale, "/checkout"));
   }
 
   function onSelectVariant(id: string) {
@@ -170,6 +178,9 @@ export function ProductPurchasePanel({
             <ShoppingBagIcon className="size-4" aria-hidden="true" />
             {unavailable ? labels.unavailableAction : labels.addToCart}
           </Button>
+          <Button type="button" variant="secondary" size="lg" className="flex-1" disabled={unavailable} onClick={buyNow}>
+            {labels.buyNow}
+          </Button>
           <Button
             type="button"
             variant={wishlisted ? "secondary" : "outline"}
@@ -191,6 +202,7 @@ export function ProductPurchasePanel({
         <div className="flex flex-col gap-2 sm:flex-row">
           <Link
             href={withLocale(locale, "/checkout")}
+            onClick={() => clearBuyNowDraft()}
             className={cn(
               "inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-4 text-sm font-medium hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
               unavailable && "pointer-events-none opacity-50",
@@ -212,6 +224,7 @@ export function ProductPurchasePanel({
             {msg}
           </p>
         ) : null}
+        <p className="text-xs leading-5 text-muted-foreground">{labels.buyNowHint}</p>
         <p className="text-xs text-muted-foreground">
           {labels.quantityLabel}: 1 ({labels.quantityNote})
         </p>

@@ -10,3 +10,4 @@ export * from "./platform";
 export * from "./home";
 export * from "./browse";
 export * from "./pdp";
+export * from "./checkout";

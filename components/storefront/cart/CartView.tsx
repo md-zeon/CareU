@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/catalog/price";
 import type { Locale } from "@/lib/i18n/routing";
+import { clearBuyNowDraft } from "@/lib/mock/checkout";
 import { useWishlistActionGate } from "@/lib/prototype/useWishlistActionGate";
 import { groupCartLines, resolveLines, summarizeCart } from "@/lib/store/shared/resolve";
 import { useSharedStore, useSharedStoreActions, useSharedStoreHydrated } from "@/lib/store/shared/hooks";
@@ -63,6 +64,7 @@ export function CartView({ locale }: { locale: Locale }) {
 
   function proceedToCheckout() {
     run(() => {
+      clearBuyNowDraft();
       actions.proceedToCheckout(resolvedActive.filter((line) => line.selected && line.isAvailable).map((line) => line.lineId));
       router.push(withLocale(locale, "/checkout"));
     });

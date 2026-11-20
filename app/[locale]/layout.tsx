@@ -58,12 +58,14 @@ export default async function LocaleLayout({ children }: LocaleLayoutProps) {
     Cart?: AbstractIntlMessages;
     Wishlist?: AbstractIntlMessages;
     Checkout?: AbstractIntlMessages;
+    OrderConfirmation?: AbstractIntlMessages;
   };
   const clientMessages = {
     PrototypeAccess: messages.PrototypeAccess ?? {},
     Cart: messages.Cart ?? {},
     Wishlist: messages.Wishlist ?? {},
     Checkout: messages.Checkout ?? {},
+    OrderConfirmation: messages.OrderConfirmation ?? {},
   };
 
   return (
