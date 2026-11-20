@@ -8,6 +8,7 @@ import type { PrototypePersonaOption, PrototypeSession } from "./types";
 type PrototypeSessionContextValue = {
   session: PrototypeSession;
   activePersona: PrototypePersonaOption;
+  hydrated: boolean;
   setActivePersona: (id: string) => void;
   togglePanel: () => void;
   openPanel: () => void;
@@ -23,11 +24,13 @@ function normalizeSession(session: PrototypeSession): PrototypeSession {
 
 export function PrototypeSessionProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<PrototypeSession>(defaultPrototypeSession);
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     // Sync persisted prototype session after mount to avoid server/client mismatch.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setSession(normalizeSession(readPrototypeSession()));
+    setHydrated(true);
   }, []);
 
   const updateSession = useCallback((updater: (prev: PrototypeSession) => PrototypeSession) => {
@@ -56,8 +59,8 @@ export function PrototypeSessionProvider({ children }: { children: ReactNode }) 
   );
 
   const value = useMemo(
-    () => ({ session, activePersona, setActivePersona, togglePanel, openPanel, closePanel }),
-    [session, activePersona, setActivePersona, togglePanel, openPanel, closePanel],
+    () => ({ session, activePersona, hydrated, setActivePersona, togglePanel, openPanel, closePanel }),
+    [session, activePersona, hydrated, setActivePersona, togglePanel, openPanel, closePanel],
   );
 
   return <PrototypeSessionContext.Provider value={value}>{children}</PrototypeSessionContext.Provider>;

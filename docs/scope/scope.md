@@ -27,7 +27,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 8 | Customer product and review journey | Phase 1 · Customer journeys | done |
 | 9 | Customer cart and wishlist journey | Phase 1 · Customer journeys | done |
 | 10 | Customer checkout and order confirmation journey | Phase 1 · Customer journeys | in-progress |
-| 11 | Customer account, addresses, orders, and tracking journey | Phase 1 · Customer journeys | planned |
+| 11 | Customer account, addresses, orders, and tracking journey | Phase 1 · Customer journeys | done |
 | 12 | Customer support and trust pages journey | Phase 1 · Customer journeys | planned |
 | 13 | Seller entry, onboarding, and shop setup journey | Phase 2 · Seller journeys | planned |
 | 14 | Seller dashboard and shop management journey | Phase 2 · Seller journeys | planned |
@@ -207,10 +207,17 @@ spec [0010](../specs/0010-customer-checkout-and-order-confirmation-journey/index
   - [x] Milestone 4: implement snapshot totals with `lib/money`, the late availability block, the disabled state and retry during placement, and the separate confirmation route with deterministic order number, per shop summary, and session storage refresh, satisfies **AC-11**, **AC-12**, **AC-13**
   - [x] Milestone 5: complete the prototype switcher scenario coverage and the bilingual, integer BDT, local asset, responsive, and state consistency pass, satisfies **AC-2**, **AC-9**, **AC-15**
 
-### 11. Customer account, addresses, orders, and tracking journey · needs a decision
+### 11. Customer account, addresses, orders, and tracking journey
 Prototype customer account areas: profile, saved addresses, order history and detail, per shipment status views, and order tracking. Follow CareU policy: tracking requires sign in. Use mock order and shipment states.
 **Done when:** a mock signed in customer can manage profile and address screens, review orders, and track shipments through complete UI states.
-- [ ] Design it (spec): `/architect customer account, addresses, orders, and tracking journey`
+spec [0011](../specs/0011-customer-account-orders-tracking-journey/index.md) · code in `lib/mock/account/`, `lib/store/account/`, `components/storefront/account/`, `app/[locale]/(storefront)/account/`, `app/[locale]/(storefront)/order/track/page.tsx`, `lib/prototype/config.ts`, `lib/prototype/session.tsx`, `app/[locale]/layout.tsx`, `lib/i18n/messages/en.json`, `lib/i18n/messages/bn.json`, `docs/specs/0011-customer-account-orders-tracking-journey/verify.md`
+- [x] Design it (spec): `/architect customer account, addresses, orders, and tracking journey`
+- [x] Build it: `/develop customer account, addresses, orders, and tracking journey`
+  - [x] Milestone 1: add account, address, order, detail, and tracking message namespaces for en and bn plus noindex metadata, then create the `lib/mock/account` contracts, fixtures, scenario helpers, status derivation, not found results, and getters, satisfies **AC-2**, **AC-5**, **AC-6**, **AC-7**, **AC-10**, **AC-11**, **AC-14**
+  - [x] Milestone 2: create the versioned `lib/store/account` with skipHydration, manual rehydrate, normalized merge, selectors, and persona reset, then build the nested account shell with profile and address pages and wire save, delete with confirm, and set default with zod validation, satisfies **AC-1**, **AC-2**, **AC-3**, **AC-4**, **AC-12**, **AC-13**, **AC-14**
+  - [x] Milestone 3: build order history with status tabs and counts and order detail with snapshots, per shop groups, totals, and shipment cards, satisfies **AC-5**, **AC-6**, **AC-14**
+  - [x] Milestone 4: build the tracking view from shipment status events with progress steps, timeline, and the exception alert and support link, then extend the prototype switcher with all account scenarios and the unknown value fallback, satisfies **AC-7**, **AC-8**, **AC-9**, **AC-13**
+  - [x] Milestone 5: run the boundary pass over ownership filtering, bilingual strings, Intl dates, integer BDT money, local assets, responsive layout, and the no backend guarantee, satisfies **AC-2**, **AC-10**, **AC-11**, **AC-14**
 
 ### 12. Customer support and trust pages journey · needs a decision
 Prototype help and trust surfaces: contact and FAQ, order linked support entry points, return and policy information, and legal pages (privacy, terms, consent) as navigable content screens.

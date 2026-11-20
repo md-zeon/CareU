@@ -11,6 +11,7 @@ import type { ReactNode } from "react";
 import { routing } from "@/lib/i18n/routing";
 import { PrototypeSessionProvider } from "@/lib/prototype/session";
 import { SharedPrototypeStoreProvider } from "@/lib/store/shared/provider";
+import { AccountStoreProvider } from "@/lib/store/account/provider";
 import { PrototypeChrome } from "@/components/prototype/PrototypeChrome";
 
 const inter = Inter({
@@ -59,6 +60,11 @@ export default async function LocaleLayout({ children }: LocaleLayoutProps) {
     Wishlist?: AbstractIntlMessages;
     Checkout?: AbstractIntlMessages;
     OrderConfirmation?: AbstractIntlMessages;
+    Account?: AbstractIntlMessages;
+    Addresses?: AbstractIntlMessages;
+    Orders?: AbstractIntlMessages;
+    OrderDetail?: AbstractIntlMessages;
+    Tracking?: AbstractIntlMessages;
   };
   const clientMessages = {
     PrototypeAccess: messages.PrototypeAccess ?? {},
@@ -66,6 +72,11 @@ export default async function LocaleLayout({ children }: LocaleLayoutProps) {
     Wishlist: messages.Wishlist ?? {},
     Checkout: messages.Checkout ?? {},
     OrderConfirmation: messages.OrderConfirmation ?? {},
+    Account: messages.Account ?? {},
+    Addresses: messages.Addresses ?? {},
+    Orders: messages.Orders ?? {},
+    OrderDetail: messages.OrderDetail ?? {},
+    Tracking: messages.Tracking ?? {},
   };
 
   return (
@@ -77,8 +88,10 @@ export default async function LocaleLayout({ children }: LocaleLayoutProps) {
         <NextIntlClientProvider locale={locale} messages={clientMessages}>
           <PrototypeSessionProvider>
             <SharedPrototypeStoreProvider>
-              {children}
-              <PrototypeChrome />
+              <AccountStoreProvider>
+                {children}
+                <PrototypeChrome />
+              </AccountStoreProvider>
             </SharedPrototypeStoreProvider>
           </PrototypeSessionProvider>
         </NextIntlClientProvider>
